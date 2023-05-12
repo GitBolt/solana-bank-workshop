@@ -1,16 +1,13 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-import { Button, Flex, Input, Text, useToast } from '@chakra-ui/react'
+import { Button, Flex, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, Text, useToast } from '@chakra-ui/react'
 import { Navbar } from '@/components/Navbar'
 import { useState } from 'react'
 import { openBankAccount } from '@/util/program/openAccount'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet'
 import { useRouter } from 'next/router'
+import { getBankAccount } from '@/util/program/getBankAccount'
 
-const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
 
@@ -22,7 +19,13 @@ export default function Home() {
 
 
   const handleSubmit = async () => {
-
+    if (!amount || !name) {
+      toast({
+        status: "error",
+        title: "Enter both name and amount"
+      })
+      return
+    }
     if (!wallet) {
       toast({
         status: "error",
@@ -36,6 +39,7 @@ export default function Home() {
       name,
       amount
     )
+    console.log(res)
     if (res.error) {
       toast({
         status: "error",
@@ -70,12 +74,16 @@ export default function Home() {
 
           <Flex flexFlow="column" w="80%">
             <Text fontSize="20px" color="#787792">Enter your Name</Text>
-            <Input color="white" fontSize="20px" border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
+            <Input color="white" fontSize="20px"  onChange={(e) => setName(e.target.value)} border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
           </Flex>
 
           <Flex flexFlow="column" w="80%">
             <Text fontSize="20px" color="#787792">Initial Deposit Amount</Text>
-            <Input color="white" fontSize="20px" border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
+            <NumberInput onChange={(e) => setAmount(Number(e))} color="white" fontSize="20px" border="1px solid #30354F" bg="transparent" height="50px" w="100%">
+              <NumberInputField />
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInput>
           </Flex>
 
           <Button onClick={handleSubmit} h="60px" borderRadius="30px" w="40%" bg="#1959FC" fontSize="25px" color="white" _hover={{ bg: "#1959F0" }}>Create Account</Button>

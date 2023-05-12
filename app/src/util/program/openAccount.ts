@@ -43,7 +43,7 @@ export const openBankAccount = async (
         // Others
         holder: wallet.publicKey,
         systemProgram: SystemProgram.programId,
-      }).rpc()
+      }).rpc({ skipPreflight: true })
 
     return { error: false, sig }
 

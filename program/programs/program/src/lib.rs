@@ -5,10 +5,14 @@ use anchor_lang::solana_program::{
 use anchor_lang::InstructionData;
 use clockwork_sdk::state::{Thread, ThreadAccount};
 
-declare_id!("611igfTen8mrQpsKDeipSu5G885VXK1xmotvrAEj6r5V");
+declare_id!("5mP16ymxF7Ac2hw85oAzCJUUnu9deUvYTyWhaQ4M7H39");
 
 const ANNUAL_INTEREST: f64 = 100.0;
 const CRON_SCHEDULE: &str = "*/10 * * * * * *"; // 10s https://crontab.guru/
+const AUTOMATION_FEE: f64 = 0.05;
+
+pub const BANK_ACCOUNT_SEED: &[u8] = b"bank_account";
+pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
 
 fn calculate_balance(created_at: i64, current_balance: f64) -> f64 {
     let now = Clock::get().unwrap().unix_timestamp;
@@ -50,11 +54,13 @@ pub mod bank {
                 bank_account: bank_account.key(),
                 thread: thread.key(),
                 thread_authority: thread_authority.key(),
-            }.to_account_metas(Some(true)),
+            }
+            .to_account_metas(Some(true)),
             data: crate::instruction::UpdateBalance {
                 _thread_id: thread_id.clone(),
                 new_balance: calculate_balance(bank_account.created_at, bank_account.balance),
-            }.data(),
+            }
+            .data(),
         };
 
         // Clockwork Trigger
@@ -76,7 +82,7 @@ pub mod bank {
                 },
                 &[&[THREAD_AUTHORITY_SEED, &[bump]]],
             ),
-            0.05 as u64 * LAMPORTS_PER_SOL, // https://docs.clockwork.xyz/developers/threads/fees
+            AUTOMATION_FEE as u64 * LAMPORTS_PER_SOL, // https://docs.clockwork.xyz/developers/threads/fees
             thread_id,
             vec![target_ix.into()],
             trigger,
@@ -134,23 +140,6 @@ pub struct BankAccount {
     pub bump: u8,
 }
 
-pub const BANK_ACCOUNT_SEED: &[u8] = b"bank_account";
-/// Seed for thread_authority PDA.
-pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
-
-#[derive(Accounts)]
-#[instruction(_thread_id: Vec<u8>)]
-pub struct UpdateBalance<'info> {
-    #[account(mut, seeds = [BANK_ACCOUNT_SEED, _thread_id.as_ref()], bump)]
-    pub bank_account: Account<'info, BankAccount>,
-
-    #[account(signer, constraint = thread.authority.eq(&thread_authority.key()))]
-    pub thread: Account<'info, Thread>,
-
-    #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
-    pub thread_authority: SystemAccount<'info>,
-}
-
 #[derive(Accounts)]
 #[instruction(thread_id: Vec<u8>)]
 pub struct Initialize<'info> {
@@ -180,6 +169,19 @@ pub struct Initialize<'info> {
     pub thread: SystemAccount<'info>,
 
     /// The pda that will own and manage the thread.
+    #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
+    pub thread_authority: SystemAccount<'info>,
+}
+
+#[derive(Accounts)]
+#[instruction(_thread_id: Vec<u8>)]
+pub struct UpdateBalance<'info> {
+    #[account(mut, seeds = [BANK_ACCOUNT_SEED, _thread_id.as_ref()], bump)]
+    pub bank_account: Account<'info, BankAccount>,
+
+    #[account(signer, constraint = thread.authority.eq(&thread_authority.key()))]
+    pub thread: Account<'info, Thread>,
+
     #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
     pub thread_authority: SystemAccount<'info>,
 }
