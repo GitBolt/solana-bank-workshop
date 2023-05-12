@@ -1,33 +1,49 @@
 import * as anchor from '@project-serum/anchor'
-import { anchorProgram } from '@/util/anchorProgram';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { ClockworkProvider } from "@clockwork-xyz/sdk";
+import { anchorProgram } from '@/util/helper';
 
-export const createExpense = async (
+export const openBankAccount = async (
   wallet: anchor.Wallet,
-  merchantName: string,
-  itemAmount: number,
+  holderName: string,
+  initialDeposit: number,
 ) => {
   const program = anchorProgram(wallet);
 
+  const clockworkProvider = ClockworkProvider.fromAnchorProvider(
+    program.provider as anchor.AnchorProvider
+  );
 
-  // Not the best way
-  const newId = String(+new Date())
-  console.log(newId)
+  const threadId = "bank_account-" + new Date().getTime() / 1000;
 
-  let [expense_account] = anchor.web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("expense"), wallet.publicKey.toBuffer(), Buffer.from(newId)],
+  const [bank_account] = PublicKey.findProgramAddressSync(
+    [anchor.utils.bytes.utf8.encode("bank_account"), Buffer.from(threadId)],
     program.programId
   );
 
+  const [threadAuthority] = PublicKey.findProgramAddressSync(
+    [anchor.utils.bytes.utf8.encode("authority")],
+    program.programId
+  );
+  const [threadAddress] = clockworkProvider.getThreadPDA(
+    threadAuthority,
+    threadId
+  );
+
   try {
-    const sig = await program.methods.initializeExpense(
-      newId,
-      merchantName,
-      new anchor.BN(itemAmount)
-    ).accounts({
-      expenseAccount: expense_account,
-      authority: wallet.publicKey,
-    })
-      .rpc();
+    const sig = await program.methods.initializeAccount(Buffer.from(threadId), holderName, Number(initialDeposit.toFixed(2)))
+      .accounts({
+        bankAccount: bank_account,
+
+        // Clockwork
+        clockworkProgram: clockworkProvider.threadProgram.programId,
+        thread: threadAddress,
+        threadAuthority: threadAuthority,
+
+        // Others
+        holder: wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      }).rpc()
 
     return { error: false, sig }
 

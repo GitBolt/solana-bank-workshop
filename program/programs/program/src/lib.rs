@@ -8,7 +8,7 @@ use clockwork_sdk::state::{Thread, ThreadAccount};
 declare_id!("611igfTen8mrQpsKDeipSu5G885VXK1xmotvrAEj6r5V");
 
 const ANNUAL_INTEREST: f64 = 100.0;
-const CRON_SCHEDULE: &str = "*/5 * * * * * *"; // https://crontab.guru/
+const CRON_SCHEDULE: &str = "*/10 * * * * * *"; // 10s https://crontab.guru/
 
 fn calculate_balance(created_at: i64, current_balance: f64) -> f64 {
     let now = Clock::get().unwrap().unix_timestamp;
@@ -32,12 +32,13 @@ pub mod bank {
         // Accounts
         let system_program = &ctx.accounts.system_program;
         let clockwork_program = &ctx.accounts.clockwork_program;
-        let payer = &ctx.accounts.payer;
+        let holder = &ctx.accounts.holder;
         let thread = &ctx.accounts.thread;
         let thread_authority = &ctx.accounts.thread_authority;
         let bank_account = &mut ctx.accounts.bank_account;
 
         // Assigning init data
+        bank_account.holder = *holder.key;
         bank_account.balance = balance;
         bank_account.holder_name = holder_name;
         bank_account.created_at = Clock::get().unwrap().unix_timestamp;
@@ -49,13 +50,11 @@ pub mod bank {
                 bank_account: bank_account.key(),
                 thread: thread.key(),
                 thread_authority: thread_authority.key(),
-            }
-            .to_account_metas(Some(true)),
+            }.to_account_metas(Some(true)),
             data: crate::instruction::UpdateBalance {
-                thread_id: thread_id.clone(),
+                _thread_id: thread_id.clone(),
                 new_balance: calculate_balance(bank_account.created_at, bank_account.balance),
-            }
-            .data(),
+            }.data(),
         };
 
         // Clockwork Trigger
@@ -70,23 +69,27 @@ pub mod bank {
             CpiContext::new_with_signer(
                 clockwork_program.to_account_info(),
                 clockwork_sdk::cpi::ThreadCreate {
-                    payer: payer.to_account_info(),
+                    payer: holder.to_account_info(),
                     system_program: system_program.to_account_info(),
                     thread: thread.to_account_info(),
                     authority: thread_authority.to_account_info(),
                 },
                 &[&[THREAD_AUTHORITY_SEED, &[bump]]],
             ),
-            LAMPORTS_PER_SOL,       // amount
-            thread_id,              // id
-            vec![target_ix.into()], // instructions
-            trigger,                // trigger
+            0.05 as u64 * LAMPORTS_PER_SOL, // https://docs.clockwork.xyz/developers/threads/fees
+            thread_id,
+            vec![target_ix.into()],
+            trigger,
         )?;
 
         Ok(())
     }
 
-    pub fn update_balance(ctx: Context<UpdateBalance>, thread_id: Vec<u8>, new_balance: f64) -> Result<()> {
+    pub fn update_balance(
+        ctx: Context<UpdateBalance>,
+        _thread_id: Vec<u8>,
+        new_balance: f64,
+    ) -> Result<()> {
         let bank_account = &mut ctx.accounts.bank_account;
         bank_account.balance += new_balance;
         bank_account.updated_at = Clock::get().unwrap().unix_timestamp;
@@ -99,10 +102,9 @@ pub mod bank {
     }
 
     pub fn reset(ctx: Context<Reset>) -> Result<()> {
-
         // Accounts
         let clockwork_program = &ctx.accounts.clockwork_program;
-        let payer = &ctx.accounts.payer;
+        let holder = &ctx.accounts.holder;
         let thread = &ctx.accounts.thread;
         let thread_authority = &ctx.accounts.thread_authority;
 
@@ -112,7 +114,7 @@ pub mod bank {
             clockwork_program.to_account_info(),
             clockwork_sdk::cpi::ThreadDelete {
                 authority: thread_authority.to_account_info(),
-                close_to: payer.to_account_info(),
+                close_to: holder.to_account_info(),
                 thread: thread.to_account_info(),
             },
             &[&[THREAD_AUTHORITY_SEED, &[bump]]],
@@ -124,8 +126,9 @@ pub mod bank {
 #[account]
 #[derive(Default)]
 pub struct BankAccount {
-    pub balance: f64,
+    pub holder: Pubkey,
     pub holder_name: String,
+    pub balance: f64,
     pub created_at: i64,
     pub updated_at: i64,
     pub bump: u8,
@@ -135,11 +138,10 @@ pub const BANK_ACCOUNT_SEED: &[u8] = b"bank_account";
 /// Seed for thread_authority PDA.
 pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
 
-
 #[derive(Accounts)]
-#[instruction(thread_id: Vec<u8>)]
+#[instruction(_thread_id: Vec<u8>)]
 pub struct UpdateBalance<'info> {
-    #[account(mut, seeds = [BANK_ACCOUNT_SEED, thread_id.as_ref()], bump)]
+    #[account(mut, seeds = [BANK_ACCOUNT_SEED, _thread_id.as_ref()], bump)]
     pub bank_account: Account<'info, BankAccount>,
 
     #[account(signer, constraint = thread.authority.eq(&thread_authority.key()))]
@@ -155,7 +157,7 @@ pub struct Initialize<'info> {
     /// The counter account to initialize.
     #[account(
         init,
-        payer = payer,
+        payer = holder,
         seeds = [BANK_ACCOUNT_SEED, thread_id.as_ref()],
         bump,
         space = 8 + std::mem::size_of::< BankAccount > (),
@@ -166,10 +168,8 @@ pub struct Initialize<'info> {
     #[account(address = clockwork_sdk::ID)]
     pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
 
-    /// The signer who will pay to initialize the program.
-    /// (not to be confused with the thread executions).
     #[account(mut)]
-    pub payer: Signer<'info>,
+    pub holder: Signer<'info>,
 
     /// The Solana system program.
     #[account(address = system_program::ID)]
@@ -188,7 +188,7 @@ pub struct Initialize<'info> {
 pub struct Reset<'info> {
     /// The signer.
     #[account(mut)]
-    pub payer: Signer<'info>,
+    pub holder: Signer<'info>,
 
     /// The Clockwork thread program.
     #[account(address = clockwork_sdk::ID)]
@@ -207,7 +207,7 @@ pub struct Reset<'info> {
         mut,
         seeds = [BANK_ACCOUNT_SEED],
         bump,
-        close = payer
+        close = holder
     )]
     pub bank_account: Account<'info, BankAccount>,
 }
