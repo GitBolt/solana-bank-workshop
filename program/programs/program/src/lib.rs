@@ -8,6 +8,7 @@ use clockwork_sdk::state::{Thread, ThreadAccount};
 declare_id!("611igfTen8mrQpsKDeipSu5G885VXK1xmotvrAEj6r5V");
 
 const ANNUAL_INTEREST: f64 = 100.0;
+const CRON_SCHEDULE: &str = "*/5 * * * * * *"; // https://crontab.guru/
 
 fn calculate_balance(created_at: i64, current_balance: f64) -> f64 {
     let now = Clock::get().unwrap().unix_timestamp;
@@ -25,10 +26,10 @@ pub mod bank {
     pub fn initialize_account(
         ctx: Context<Initialize>,
         thread_id: Vec<u8>,
-        holderName: String,
+        holder_name: String,
         balance: f64,
     ) -> Result<()> {
-        // Account
+        // Accounts
         let system_program = &ctx.accounts.system_program;
         let clockwork_program = &ctx.accounts.clockwork_program;
         let payer = &ctx.accounts.payer;
@@ -36,30 +37,34 @@ pub mod bank {
         let thread_authority = &ctx.accounts.thread_authority;
         let bank_account = &mut ctx.accounts.bank_account;
 
+        // Assigning init data
         bank_account.balance = balance;
-        bank_account.holder_name = holderName;
+        bank_account.holder_name = holder_name;
         bank_account.created_at = Clock::get().unwrap().unix_timestamp;
 
-        // 1️⃣ Prepare an instruction to be automated.
+        // Clockwork Instruction
         let target_ix = Instruction {
             program_id: ID,
-            accounts: crate::accounts::UpdateAccount {
+            accounts: crate::accounts::UpdateBalance {
                 bank_account: bank_account.key(),
                 thread: thread.key(),
                 thread_authority: thread_authority.key(),
-            }.to_account_metas(Some(true)),
-            data: crate::instruction::UpdateAccount {
+            }
+            .to_account_metas(Some(true)),
+            data: crate::instruction::UpdateBalance {
+                thread_id: thread_id.clone(),
                 new_balance: calculate_balance(bank_account.created_at, bank_account.balance),
-            }.data(),
+            }
+            .data(),
         };
 
-        // 2️⃣ Define a trigger for the thread (every 10 secs).
+        // Clockwork Trigger
         let trigger = clockwork_sdk::state::Trigger::Cron {
-            schedule: "*/5 * * * * * *".into(),
+            schedule: CRON_SCHEDULE.to_string(),
             skippable: true,
         };
 
-        // 3️⃣ Create thread via CPI.
+        // Clockwork thread CPI
         let bump = *ctx.bumps.get("thread_authority").unwrap();
         clockwork_sdk::cpi::thread_create(
             CpiContext::new_with_signer(
@@ -81,12 +86,12 @@ pub mod bank {
         Ok(())
     }
 
-    pub fn update_account(ctx: Context<UpdateAccount>, new_balance: f64) -> Result<()> {
+    pub fn update_balance(ctx: Context<UpdateBalance>, thread_id: Vec<u8>, new_balance: f64) -> Result<()> {
         let bank_account = &mut ctx.accounts.bank_account;
         bank_account.balance += new_balance;
         bank_account.updated_at = Clock::get().unwrap().unix_timestamp;
         msg!(
-            "Balance value: {}, updated_at: {}",
+            "New Balance: {}, Updated_at: {}",
             bank_account.balance,
             bank_account.updated_at
         );
@@ -94,13 +99,14 @@ pub mod bank {
     }
 
     pub fn reset(ctx: Context<Reset>) -> Result<()> {
-        // Get accounts
+
+        // Accounts
         let clockwork_program = &ctx.accounts.clockwork_program;
         let payer = &ctx.accounts.payer;
         let thread = &ctx.accounts.thread;
         let thread_authority = &ctx.accounts.thread_authority;
 
-        // Delete thread via CPI.
+        // Delete thread via CPI
         let bump = *ctx.bumps.get("thread_authority").unwrap();
         clockwork_sdk::cpi::thread_delete(CpiContext::new_with_signer(
             clockwork_program.to_account_info(),
@@ -125,15 +131,15 @@ pub struct BankAccount {
     pub bump: u8,
 }
 
-/// Seed for deriving the `Counter` account PDA.
-pub const SEED_COUNTER: &[u8] = b"counter";
-
+pub const BANK_ACCOUNT_SEED: &[u8] = b"bank_account";
 /// Seed for thread_authority PDA.
 pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
 
+
 #[derive(Accounts)]
-pub struct UpdateAccount<'info> {
-    #[account(mut, seeds = [SEED_COUNTER], bump)]
+#[instruction(thread_id: Vec<u8>)]
+pub struct UpdateBalance<'info> {
+    #[account(mut, seeds = [BANK_ACCOUNT_SEED, thread_id.as_ref()], bump)]
     pub bank_account: Account<'info, BankAccount>,
 
     #[account(signer, constraint = thread.authority.eq(&thread_authority.key()))]
@@ -150,7 +156,7 @@ pub struct Initialize<'info> {
     #[account(
         init,
         payer = payer,
-        seeds = [SEED_COUNTER],
+        seeds = [BANK_ACCOUNT_SEED, thread_id.as_ref()],
         bump,
         space = 8 + std::mem::size_of::< BankAccount > (),
     )]
@@ -199,7 +205,7 @@ pub struct Reset<'info> {
     /// Close the counter account
     #[account(
         mut,
-        seeds = [SEED_COUNTER],
+        seeds = [BANK_ACCOUNT_SEED],
         bump,
         close = payer
     )]
