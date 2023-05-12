@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST={"../components/Navbar.tsx -> ../components/WalletButton":{"id":"../components/Navbar.tsx -> ../components/WalletButton","files":["static/chunks/src_components_WalletButton_tsx.js"]}}
