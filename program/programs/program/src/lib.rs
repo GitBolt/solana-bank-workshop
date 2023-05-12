@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::{self};
 use anchor_lang::solana_program::{
     instruction::Instruction, native_token::LAMPORTS_PER_SOL, system_program,
 };
@@ -7,7 +8,7 @@ use clockwork_sdk::state::{Thread, ThreadAccount};
 
 declare_id!("5mP16ymxF7Ac2hw85oAzCJUUnu9deUvYTyWhaQ4M7H39");
 
-const ANNUAL_INTEREST: f64 = 100.0;
+const ANNUAL_INTEREST: f64 = 2.5; // 2.5% interest return
 const CRON_SCHEDULE: &str = "*/10 * * * * * *"; // 10s https://crontab.guru/
 const AUTOMATION_FEE: f64 = 0.05;
 
@@ -18,9 +19,9 @@ fn calculate_balance(created_at: i64, current_balance: f64) -> f64 {
     let now = Clock::get().unwrap().unix_timestamp;
     let elapsed_seconds = now - created_at;
 
-    let interest_per_second = ANNUAL_INTEREST / 31536000.0 as f64; // number of seconds in a year
+    let interest_per_second = ANNUAL_INTEREST / 60.0 as f64; // number of seconds in a minute
     let interest_earned = current_balance as f64 * elapsed_seconds as f64 * interest_per_second;
-    current_balance + interest_earned
+    return current_balance + interest_earned;
 }
 
 #[program]
@@ -42,6 +43,7 @@ pub mod bank {
         let bank_account = &mut ctx.accounts.bank_account;
 
         // Assigning init data
+        bank_account.thread_id = thread_id.clone();
         bank_account.holder = *holder.key;
         bank_account.balance = balance;
         bank_account.holder_name = holder_name;
@@ -107,6 +109,21 @@ pub mod bank {
         Ok(())
     }
 
+    pub fn withdraw(
+        ctx: Context<UpdateBalance>,
+        _thread_id: Vec<u8>,
+    ) -> Result<()> {
+        let bank_account = &mut ctx.accounts.bank_account;
+        bank_account.balance = 0.0;
+        bank_account.updated_at = Clock::get().unwrap().unix_timestamp;
+        msg!(
+            "New Balance: {}, Updated_at: {}",
+            bank_account.balance,
+            bank_account.updated_at
+        );
+        Ok(())
+    }
+
     pub fn reset(ctx: Context<Reset>) -> Result<()> {
         // Accounts
         let clockwork_program = &ctx.accounts.clockwork_program;
@@ -127,17 +144,10 @@ pub mod bank {
         ))?;
         Ok(())
     }
-}
 
-#[account]
-#[derive(Default)]
-pub struct BankAccount {
-    pub holder: Pubkey,
-    pub holder_name: String,
-    pub balance: f64,
-    pub created_at: i64,
-    pub updated_at: i64,
-    pub bump: u8,
+    pub fn delete(_ctx: Context<DeleteAccount>, _thread_id: Vec<u8>) -> Result<()> {
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
@@ -186,6 +196,42 @@ pub struct UpdateBalance<'info> {
     pub thread_authority: SystemAccount<'info>,
 }
 
+
+#[derive(Accounts)]
+#[instruction(_thread_id: Vec<u8>)]
+pub struct UpdateBalanceManual<'info> {
+    #[account(mut, seeds = [BANK_ACCOUNT_SEED, _thread_id.as_ref()], bump)]
+    pub bank_account: Account<'info, BankAccount>,
+
+    #[account(signer, constraint = thread.authority.eq(&thread_authority.key()))]
+    pub thread: Account<'info, Thread>,
+
+    #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
+    pub thread_authority: SystemAccount<'info>,
+}
+
+
+#[derive(Accounts)]
+#[instruction(_thread_id : Vec<u8>)]
+pub struct DeleteAccount<'info> {
+    #[account(mut)]
+    pub holder: Signer<'info>,
+
+    #[account(
+        mut,
+        close = holder,
+        seeds = [BANK_ACCOUNT_SEED, _thread_id.as_ref()],
+        bump=bank_account.bump
+    )]
+    pub bank_account: Account<'info, BankAccount>,
+
+    // Misc Accounts
+    #[account(address = system_program::ID)]
+    pub system_program: Program<'info, System>,
+    #[account(address = solana_program::sysvar::rent::ID)]
+    pub rent: Sysvar<'info, Rent>,
+}
+
 #[derive(Accounts)]
 pub struct Reset<'info> {
     /// The signer.
@@ -212,4 +258,16 @@ pub struct Reset<'info> {
         close = holder
     )]
     pub bank_account: Account<'info, BankAccount>,
+}
+
+#[account]
+#[derive(Default)]
+pub struct BankAccount {
+    pub holder: Pubkey,
+    pub holder_name: String,
+    pub balance: f64,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub thread_id: Vec<u8>,
+    pub bump: u8,
 }
