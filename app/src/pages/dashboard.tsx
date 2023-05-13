@@ -10,7 +10,6 @@ import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet'
 import { useRouter } from 'next/router'
 import { getBankAccount } from '@/util/program/getBankAccount'
-import { closeBankAccount } from '@/util/program/closeBankAccount'
 import { addBalance } from '@/util/program/addBalance'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { anchorProgram } from '@/util/helper'
@@ -80,26 +79,6 @@ export default function Home() {
     console.log(res)
   }
 
-  const onDelete = async () => {
-    const res = await closeBankAccount(
-      wallet as NodeWallet,
-      currentAccount.threadId
-    )
-    console.log(res)
-
-    // if (res.error) {
-    //   toast({
-    //     status: "error",
-    //     title: res.error
-    //   })
-    // } else {
-    //   toast({
-    //     status: "success",
-    //     title: "Sig: " + res.sig
-    //   })
-    //   router.push("/")
-    // }
-  }
 
 
   return (
@@ -152,7 +131,6 @@ export default function Home() {
 
           
           <ActionBox 
-          onDelete={onDelete}
           onDeposit={onDeposit}
           onWithdraw={onWithdraw}
           setNum={setNum}
