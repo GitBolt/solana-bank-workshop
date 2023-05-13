@@ -77,6 +77,8 @@ pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
 We have defined our minute interest first. This is the amount of interest returns we want. You can change it to any amount you want.
 
 Then, we have some seeds defined, we'll be using these seeds multiple times in our program, so defining them in seperate constants is a better practice for readability and easy access if we wanted to change it.
+
+
 ----
 
 #### 2.1 Defining InitilizeAccount context
@@ -206,6 +208,8 @@ We're targetting the `add_interest` instruction and it's context `AddInterest` f
 Then, we've defined our trigger, which is a simple cron job for us. It's using the `CRON_SCHEDULE` constant we defined earlier.
 
 Finally, we're making a CPI to clockwork thread, starting at line 69.
+
+
 ----
 
 #### 3.1 Depositing Amount
@@ -323,6 +327,8 @@ const sig = await program.methods.deposit(Buffer.from(threadId), balance)
 
 Now, open [/app/src/util/program/removeBalance.ts](/app/src/util/program/removeBalance.ts)
 You'll notice that just like how our withdraw and deposit program instructions were very similar, our clients are also pretty much the same.
+
+
 ----
 
 #### 3.1 Fetching our Bank Account
