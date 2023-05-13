@@ -67,7 +67,7 @@ export type IDLType = {
       ]
     },
     {
-      "name": "updateBalance",
+      "name": "deposit",
       "accounts": [
         {
           "name": "holder",
@@ -80,12 +80,12 @@ export type IDLType = {
           "isSigner": false
         },
         {
-          "name": "thread",
+          "name": "systemProgram",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
         },
         {
-          "name": "threadAuthority",
+          "name": "rent",
           "isMut": false,
           "isSigner": false
         }
@@ -96,7 +96,7 @@ export type IDLType = {
           "type": "bytes"
         },
         {
-          "name": "newBalance",
+          "name": "amount",
           "type": "f64"
         }
       ]
@@ -115,6 +115,36 @@ export type IDLType = {
           "isSigner": false
         },
         {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "threadId",
+          "type": "bytes"
+        },
+        {
+          "name": "amount",
+          "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "addInterest",
+      "accounts": [
+        {
+          "name": "bankAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "thread",
           "isMut": false,
           "isSigner": true
@@ -133,7 +163,7 @@ export type IDLType = {
       ]
     },
     {
-      "name": "reset",
+      "name": "removeInterest",
       "accounts": [
         {
           "name": "holder",
@@ -177,37 +207,6 @@ export type IDLType = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "closeAccount",
-      "accounts": [
-        {
-          "name": "holder",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "bankAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "threadId",
-          "type": "bytes"
-        }
-      ]
     }
   ],
   "accounts": [
@@ -246,6 +245,18 @@ export type IDLType = {
           }
         ]
       }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "AmountTooSmall",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6001,
+      "name": "AmountTooBig",
+      "msg": "Withdraw amount cannot be less than deposit"
     }
   ]
 }
@@ -318,7 +329,7 @@ export const IDLData: IDLType = {
       ]
     },
     {
-      "name": "updateBalance",
+      "name": "deposit",
       "accounts": [
         {
           "name": "holder",
@@ -331,12 +342,12 @@ export const IDLData: IDLType = {
           "isSigner": false
         },
         {
-          "name": "thread",
+          "name": "systemProgram",
           "isMut": false,
-          "isSigner": true
+          "isSigner": false
         },
         {
-          "name": "threadAuthority",
+          "name": "rent",
           "isMut": false,
           "isSigner": false
         }
@@ -347,7 +358,7 @@ export const IDLData: IDLType = {
           "type": "bytes"
         },
         {
-          "name": "newBalance",
+          "name": "amount",
           "type": "f64"
         }
       ]
@@ -366,6 +377,36 @@ export const IDLData: IDLType = {
           "isSigner": false
         },
         {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "threadId",
+          "type": "bytes"
+        },
+        {
+          "name": "amount",
+          "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "addInterest",
+      "accounts": [
+        {
+          "name": "bankAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "thread",
           "isMut": false,
           "isSigner": true
@@ -384,7 +425,7 @@ export const IDLData: IDLType = {
       ]
     },
     {
-      "name": "reset",
+      "name": "removeInterest",
       "accounts": [
         {
           "name": "holder",
@@ -428,37 +469,6 @@ export const IDLData: IDLType = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "closeAccount",
-      "accounts": [
-        {
-          "name": "holder",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "bankAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "threadId",
-          "type": "bytes"
-        }
-      ]
     }
   ],
   "accounts": [
@@ -497,6 +507,18 @@ export const IDLData: IDLType = {
           }
         ]
       }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "AmountTooSmall",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6001,
+      "name": "AmountTooBig",
+      "msg": "Withdraw amount cannot be less than deposit"
     }
   ]
 }

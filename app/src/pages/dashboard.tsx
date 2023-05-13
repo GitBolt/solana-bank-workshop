@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
-import { Box, Button, Divider, Flex, Input, Menu, MenuButton, MenuItem, MenuList, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Text, useToast } from '@chakra-ui/react'
+import { Box, Button, Divider, Flex, FormControl, FormLabel, Input, Menu, MenuButton, MenuItem, MenuList, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Text, useToast } from '@chakra-ui/react'
 import { Navbar } from '@/components/Navbar'
 import { useEffect, useState } from 'react'
 import { openBankAccount } from '@/util/program/openAccount'
@@ -14,6 +14,8 @@ import { closeBankAccount } from '@/util/program/closeBankAccount'
 import { addBalance } from '@/util/program/addBalance'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { anchorProgram } from '@/util/helper'
+import { removeBalance } from '@/util/program/removeBalance'
+import { ActionBox } from '@/components/ActionBox'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -73,6 +75,11 @@ export default function Home() {
     console.log(res)
   }
 
+  const onWithdraw = async () => {
+    const res = await removeBalance(wallet as NodeWallet, currentAccount.threadId, num)
+    console.log(res)
+  }
+
   const onDelete = async () => {
     const res = await closeBankAccount(
       wallet as NodeWallet,
@@ -80,23 +87,20 @@ export default function Home() {
     )
     console.log(res)
 
-    if (res.error) {
-      toast({
-        status: "error",
-        title: res.error
-      })
-    } else {
-      toast({
-        status: "success",
-        title: "Sig: " + res.sig
-      })
-      router.push("/")
-    }
+    // if (res.error) {
+    //   toast({
+    //     status: "error",
+    //     title: res.error
+    //   })
+    // } else {
+    //   toast({
+    //     status: "success",
+    //     title: "Sig: " + res.sig
+    //   })
+    //   router.push("/")
+    // }
   }
 
-  const onWithdraw = async () => {
-
-  }
 
   return (
     <>
@@ -109,62 +113,52 @@ export default function Home() {
 
       <Navbar />
 
-      <Flex gap="1rem" bg="#05070D" align="center" minH="100vh" h="100%" p="0 5rem" overflow="hidden" flexFlow="column">
+      <Flex overflow="hidden" gap="1rem" bg="#05070D" align="center" minH="100vh" h="100%" p="0 5rem" flexFlow="column">
 
-        <Menu>
-          <MenuButton mt="5rem" w="30rem" h="4rem" bg="blue.400" color="white" as={Button} fontSize="1.8rem" _hover={{ bg: "blue.300" }} rightIcon={<ChevronDownIcon />}>
+        <Menu preventOverflow>
+          <MenuButton mt="5rem" w="25rem" h="3rem" bg="blue.600" color="white" as={Button} fontSize="1.8rem" _hover={{ bg: "blue.300" }} rightIcon={<ChevronDownIcon />}>
             Select Account
           </MenuButton>
 
-          <MenuList bg="blue.500">
+          <MenuList bg="blue.600" p="0" border="0px" borderRadius="2rem">
             {accounts && accounts.map((acc) => (
-              <MenuItem w="30rem" key={acc.createdAt} color="gray.500" onClick={() => setCurrentAccount(acc)} bg="blue.500" border="1px solid" borderColor="blue.400">
+              <MenuItem w="25rem" key={acc.createdAt} h="3rem" color="gray.500" onClick={() => setCurrentAccount(acc)} bg="gray.700" border="1px solid" borderColor="gray.600">
                 <Flex fontSize="1.2rem" justify="space-between" w="100%">
-                  <Text color="gray.200">{acc.holderName}</Text>
-                  <Text color="gray.200">Balance: ${acc.balance}</Text>
+                  <Text color="gray.200" >{acc.holderName}</Text>
+                  <Text color="gray.200">Balance: ${Math.round(acc.balance * 10000) / 10000}</Text>
                 </Flex>
               </MenuItem>
             ))}
           </MenuList>
         </Menu>
+
         <Flex gap="1rem" bg="#05070D" justify="space-around" align="center" w="100%">
 
-          <Flex minH="50vh" p="2rem" gap="2rem" borderRadius="20px" bg="#0A0E1A" width="45%" flexFlow="column" justify="center" align="center">
-
-            <Text mt="40px" fontSize="40px" color="white" fontWeight={700}>Welcome, {currentAccount ? currentAccount.holderName : "..."}</Text>
-            <Divider borderColor="#242D45" />
-
-            <Flex align="center" justify="space-around" w="100%">
-              <Box>
-                <Text color="#4A526D" fontSize="30px">Balance</Text>
-                <Text color="white" fontSize="50px" fontWeight={700}>${currentAccount ? currentAccount.balance : "..."}</Text>
+          <Box bg="#0A0E1A" p="2rem" borderRadius="20px" width="45%" minH="60vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" boxShadow="md">
+            <Text mt="40px" fontSize="4rem" fontWeight="bold" color="white" textAlign="center">Welcome, {currentAccount ? currentAccount.holderName : "..."}</Text>
+            <Divider borderColor="#242D45" my="2rem" />
+            <Flex justify="center" w="100%">
+              <Box mr="3rem" textAlign="center">
+                <Text color="#4A526D" fontSize="4xl" fontWeight="semibold" mb="0.5rem">Balance</Text>
+                <Text color="white" fontSize="3rem" fontWeight="bold">${currentAccount ? Math.round(currentAccount.balance * 10000) / 10000 : "..."}</Text>
               </Box>
-
             </Flex>
+            <Divider borderColor="#242D45" my="2rem" />
+            <Box textAlign="center">
+              <Text fontSize="2xl" fontWeight="semibold" color="#898DA4" mb="0.5rem">Earning 5% minute return</Text>
+              <Text fontSize="2xl" fontWeight="light" color="#464854" fontStyle="italic">Balance updating every 10 seconds</Text>
+            </Box>
+          </Box>
 
-            <Divider borderColor="#242D45" />
-            <Text fontSize="30px" fontWeight={500} color="#898DA4">Earning 2.5% minute return</Text>
-            <Text fontSize="30px" fontWeight={400} color="#464854" fontStyle="italic">Balance updating every 10 seconds</Text>
-          </Flex>
+          
+          <ActionBox 
+          onDelete={onDelete}
+          onDeposit={onDeposit}
+          onWithdraw={onWithdraw}
+          setNum={setNum}
+          />
+  
 
-          <Flex minH="50vh" p="2rem" gap="2rem" borderRadius="20px" bg="#0A0E1A" width="45%" flexFlow="column" justify="center" align="center">
-
-
-            <NumberInput onChange={(e) => setNum(Number(e))} w="60%" min={0}>
-              <NumberInputField min={0} placeholder='Enter amount' color="white" fontSize="20px" border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-            <Button onClick={onDeposit} colorScheme='messenger' fontSize="2rem" w="60%" h="4rem">Deposit Funds</Button>
-            <Divider borderColor="#242D45" />
-
-            <Button onClick={onWithdraw} colorScheme='messenger' fontSize="2rem" w="60%" h="4rem">Withdraw Funds</Button>
-            <Divider borderColor="#242D45" />
-
-            <Button onClick={onDelete} colorScheme='red' fontSize="2rem" w="60%" h="4rem">Close Account</Button>
-          </Flex>
         </Flex>
       </Flex >
 

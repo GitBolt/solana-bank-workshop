@@ -68,7 +68,7 @@ export default function Home() {
       <Flex gap="1rem" bg="#05070D" align="center" flexFlow="column" minH="100vh" h="100%">
 
         <Text mt="40px" fontSize="40px" color="white" fontWeight={700}>Welcome to Solana Bank Simulator</Text>
-        <Text fontSize="30px" fontWeight={700} color="#64667B">You’ll receive 2.5% interest returns annually</Text>
+        <Text fontSize="30px" fontWeight={700} color="#64667B">You’ll receive 5% interest returns minutely</Text>
 
         <Flex minH="50vh" gap="2rem" borderRadius="20px" bg="#0A0E1A" width="50vw" p="2rem" flexFlow="column" justify="center" align="center">
 
@@ -80,8 +80,8 @@ export default function Home() {
           <Flex flexFlow="column" w="80%">
             <Text fontSize="20px" color="#787792">Initial Deposit Amount</Text>
 
-            <NumberInput onChange={(e) => setAmount(Number(e))} min={0}>
-              <NumberInputField min={0} color="white" fontSize="20px" border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
+            <NumberInput onChange={(e) => setAmount(Number(e))} min={1}>
+              <NumberInputField min={1} color="white" fontSize="20px" border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
               <NumberInputStepper>
                 <NumberIncrementStepper />
                 <NumberDecrementStepper />

@@ -3,7 +3,7 @@ import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { ClockworkProvider } from "@clockwork-xyz/sdk";
 import { anchorProgram } from '@/util/helper';
 
-export const addBalance = async (
+export const removeBalance = async (
     wallet: anchor.Wallet,
     threadId: Uint8Array,
     balance: number,
@@ -31,7 +31,7 @@ export const addBalance = async (
     );
 
     try {
-        const sig = await program.methods.deposit(Buffer.from(threadId), balance)
+        const sig = await program.methods.withdraw(Buffer.from(threadId), balance)
             .accounts({
                 bankAccount: bank_account,
                 holder: wallet.publicKey,
