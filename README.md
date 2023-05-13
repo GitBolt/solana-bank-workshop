@@ -10,7 +10,7 @@
 
 | Program         | Link                                                                                                                                                                               |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Expense Tracker | [ ![program](https://ik.imagekit.io/mkpjlhtny/solpg_button_zWM8WlPKs.svg?ik-sdk-version=javascript-1.4.3&updatedAt=1662621556513)](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) |
+| Bank Simulator | [ ![program](https://ik.imagekit.io/mkpjlhtny/solpg_button_zWM8WlPKs.svg?ik-sdk-version=javascript-1.4.3&updatedAt=1662621556513)](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) |
 
 
 ## 📗 Learn
@@ -384,9 +384,3 @@ And that is it! It's that easy to fetch particular accounts through filters. If 
 2. To launch the frontend, head over to `/app/src` directory and enter: `yarn install && yarn dev`
 
 If you're running on Localnet, you'd need to install Clockwork CLI and launch Clockwork localnet, check out [their docs](https://docs.clockwork.xyz/developers/localnet) for detailed guide!
-
-
-### Diagrams
-
-![](./assets/create_expense.png)
-![](./assets/delete_expense.png)
