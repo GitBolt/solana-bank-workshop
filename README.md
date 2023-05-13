@@ -395,7 +395,7 @@ pub thread_id: Vec<u8>,
 pub bump: u8,
 ```
 
-The first `8` byte space is for discriminator, we have to add it every time when fetching data. Then, we have specific byte values for all values in our account struct. In order to get the value `holder`, which is after discriminator, we need to shift bytes by 8 + 8. That is the **offset** you see in the TypeScript code snippet in the [section above](#3.1-fetching-our-bank-account)
+The first `8` byte space is for discriminator, we have to add it every time when fetching data. Then, we have specific byte values for all values in our account struct. In order to get the value `holder`, which is after discriminator, we need to shift bytes by 8 + 8. That is the **offset** you see in the TypeScript code snippet in the [section above](#31-fetching-our-bank-account)
 
 We just need to define the correct offset for the byte data we are looking at, and then add the actual byte data itself, which is the user's public key in this case.
 
