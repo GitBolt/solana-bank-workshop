@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { Button, Flex, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, Text, useToast } from '@chakra-ui/react'
+import { Button, Flex, Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Text, useToast } from '@chakra-ui/react'
 import { Navbar } from '@/components/Navbar'
 import { useState } from 'react'
 import { openBankAccount } from '@/util/program/openAccount'
@@ -74,15 +74,18 @@ export default function Home() {
 
           <Flex flexFlow="column" w="80%">
             <Text fontSize="20px" color="#787792">Enter your Name</Text>
-            <Input color="white" fontSize="20px"  onChange={(e) => setName(e.target.value)} border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
+            <Input color="white" fontSize="20px" onChange={(e) => setName(e.target.value)} border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
           </Flex>
 
           <Flex flexFlow="column" w="80%">
             <Text fontSize="20px" color="#787792">Initial Deposit Amount</Text>
-            <NumberInput onChange={(e) => setAmount(Number(e))} color="white" fontSize="20px" border="1px solid #30354F" bg="transparent" height="50px" w="100%">
-              <NumberInputField />
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
+
+            <NumberInput onChange={(e) => setAmount(Number(e))} min={0}>
+              <NumberInputField min={0} color="white" fontSize="20px" border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
             </NumberInput>
           </Flex>
 

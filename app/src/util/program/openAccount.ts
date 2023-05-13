@@ -8,6 +8,7 @@ export const openBankAccount = async (
   holderName: string,
   initialDeposit: number,
 ) => {
+
   const program = anchorProgram(wallet);
 
   const clockworkProvider = ClockworkProvider.fromAnchorProvider(
@@ -17,7 +18,7 @@ export const openBankAccount = async (
   const threadId = "bank_account-" + new Date().getTime() / 1000;
 
   const [bank_account] = PublicKey.findProgramAddressSync(
-    [anchor.utils.bytes.utf8.encode("bank_account"), Buffer.from(threadId)],
+    [Buffer.from("bank_account"), Buffer.from(threadId)],
     program.programId
   );
 
@@ -31,7 +32,7 @@ export const openBankAccount = async (
   );
 
   try {
-    const sig = await program.methods.initializeAccount(Buffer.from(threadId), holderName, Number(initialDeposit.toFixed(2)))
+    const ix = await program.methods.initializeAccount(Buffer.from(threadId), holderName, Number(initialDeposit.toFixed(2)))
       .accounts({
         bankAccount: bank_account,
 
@@ -43,9 +44,9 @@ export const openBankAccount = async (
         // Others
         holder: wallet.publicKey,
         systemProgram: SystemProgram.programId,
-      }).rpc({ skipPreflight: true })
+      }).rpc()
 
-    return { error: false, sig }
+    return { error: false, sig: ix }
 
   } catch (e: any) {
     console.log(e)

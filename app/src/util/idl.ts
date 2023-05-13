@@ -70,6 +70,11 @@ export type IDLType = {
       "name": "updateBalance",
       "accounts": [
         {
+          "name": "holder",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "bankAccount",
           "isMut": true,
           "isSigner": false
@@ -93,6 +98,37 @@ export type IDLType = {
         {
           "name": "newBalance",
           "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "accounts": [
+        {
+          "name": "holder",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "bankAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "thread",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "threadAuthority",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "threadId",
+          "type": "bytes"
         }
       ]
     },
@@ -141,6 +177,37 @@ export type IDLType = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "closeAccount",
+      "accounts": [
+        {
+          "name": "holder",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "bankAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "threadId",
+          "type": "bytes"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -168,6 +235,10 @@ export type IDLType = {
           {
             "name": "updatedAt",
             "type": "i64"
+          },
+          {
+            "name": "threadId",
+            "type": "bytes"
           },
           {
             "name": "bump",
@@ -250,6 +321,11 @@ export const IDLData: IDLType = {
       "name": "updateBalance",
       "accounts": [
         {
+          "name": "holder",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "bankAccount",
           "isMut": true,
           "isSigner": false
@@ -273,6 +349,37 @@ export const IDLData: IDLType = {
         {
           "name": "newBalance",
           "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "accounts": [
+        {
+          "name": "holder",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "bankAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "thread",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "threadAuthority",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "threadId",
+          "type": "bytes"
         }
       ]
     },
@@ -321,6 +428,37 @@ export const IDLData: IDLType = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "closeAccount",
+      "accounts": [
+        {
+          "name": "holder",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "bankAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "threadId",
+          "type": "bytes"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -348,6 +486,10 @@ export const IDLData: IDLType = {
           {
             "name": "updatedAt",
             "type": "i64"
+          },
+          {
+            "name": "threadId",
+            "type": "bytes"
           },
           {
             "name": "bump",
