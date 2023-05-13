@@ -8,20 +8,22 @@ use clockwork_sdk::state::{Thread, ThreadAccount};
 
 declare_id!("5mP16ymxF7Ac2hw85oAzCJUUnu9deUvYTyWhaQ4M7H39");
 
-const ANNUAL_INTEREST: f64 = 2.5; // 2.5% interest return
+// Calculating interest per minute instead of anually for faster results
+const MINUTE_INTEREST: f64 = 0.05; // 2.5% interest return
 const CRON_SCHEDULE: &str = "*/10 * * * * * *"; // 10s https://crontab.guru/
 const AUTOMATION_FEE: f64 = 0.05;
 
 pub const BANK_ACCOUNT_SEED: &[u8] = b"bank_account";
 pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
 
-fn calculate_balance(created_at: i64, current_balance: f64) -> f64 {
+fn calculate_balance(initial_deposit_time: i64, current_balance: f64) -> f64 {
+    // Calculate the accumulated value using the compound interest formula
     let now = Clock::get().unwrap().unix_timestamp;
-    let elapsed_seconds = now - created_at;
-
-    let interest_per_second = ANNUAL_INTEREST / 60.0 as f64; // number of seconds in a minute
-    let interest_earned = current_balance as f64 * elapsed_seconds as f64 * interest_per_second;
-    return current_balance + interest_earned;
+    let elapsed_time = (now - initial_deposit_time) as f64;
+    let minutes = elapsed_time / 60.0;
+    // Calculate the accumulated value using the compound interest formula
+    let accumulated_value = current_balance * (1.0 + (MINUTE_INTEREST)).powf(minutes);
+    return accumulated_value;
 }
 
 #[program]
@@ -48,6 +50,7 @@ pub mod bank {
         bank_account.balance = balance;
         bank_account.holder_name = holder_name;
         bank_account.created_at = Clock::get().unwrap().unix_timestamp;
+        bank_account.updated_at = Clock::get().unwrap().unix_timestamp;
 
         // Clockwork Instruction
         let target_ix = Instruction {
@@ -60,7 +63,7 @@ pub mod bank {
             .to_account_metas(Some(true)),
             data: crate::instruction::UpdateBalance {
                 _thread_id: thread_id.clone(),
-                new_balance: calculate_balance(bank_account.created_at, bank_account.balance),
+                new_balance: calculate_balance(bank_account.updated_at, bank_account.balance),
             }
             .data(),
         };
@@ -99,20 +102,18 @@ pub mod bank {
         new_balance: f64,
     ) -> Result<()> {
         let bank_account = &mut ctx.accounts.bank_account;
-        bank_account.balance += new_balance;
+        bank_account.balance = new_balance;
         bank_account.updated_at = Clock::get().unwrap().unix_timestamp;
         msg!(
-            "New Balance: {}, Updated_at: {}",
+            "Updated Balance: {}, Updated_at: {}, New Amount: {}",
             bank_account.balance,
-            bank_account.updated_at
+            bank_account.updated_at,
+            new_balance,
         );
         Ok(())
     }
 
-    pub fn withdraw(
-        ctx: Context<UpdateBalance>,
-        _thread_id: Vec<u8>,
-    ) -> Result<()> {
+    pub fn withdraw(ctx: Context<UpdateBalance>, _thread_id: Vec<u8>) -> Result<()> {
         let bank_account = &mut ctx.accounts.bank_account;
         bank_account.balance = 0.0;
         bank_account.updated_at = Clock::get().unwrap().unix_timestamp;
@@ -196,7 +197,6 @@ pub struct UpdateBalance<'info> {
     pub thread_authority: SystemAccount<'info>,
 }
 
-
 #[derive(Accounts)]
 #[instruction(_thread_id: Vec<u8>)]
 pub struct UpdateBalanceManual<'info> {
@@ -209,7 +209,6 @@ pub struct UpdateBalanceManual<'info> {
     #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
     pub thread_authority: SystemAccount<'info>,
 }
-
 
 #[derive(Accounts)]
 #[instruction(_thread_id : Vec<u8>)]
