@@ -46,7 +46,7 @@ export const openBankAccount = async (
         systemProgram: SystemProgram.programId,
       }).rpc()
 
-    return { error: false, sig: ix }
+    return { error: false, sig: ix, threadId }
 
   } catch (e: any) {
     console.log(e)

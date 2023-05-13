@@ -51,7 +51,7 @@ export default function Home() {
         status: "success",
         title: "Sig: " + res.sig
       })
-      router.push("/dashboard")
+      router.push("/dashboard?default=" + res.threadId)
     }
   }
 

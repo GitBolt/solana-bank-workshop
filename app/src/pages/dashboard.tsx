@@ -11,7 +11,6 @@ import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet'
 import { useRouter } from 'next/router'
 import { getBankAccount } from '@/util/program/getBankAccount'
 import { closeBankAccount } from '@/util/program/closeBankAccount'
-import { threadId } from 'worker_threads'
 import { addBalance } from '@/util/program/addBalance'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { anchorProgram } from '@/util/helper'
@@ -29,7 +28,6 @@ export default function Home() {
   const toast = useToast()
   const [num, setNum] = useState<number>(0)
 
-
   useEffect(() => {
     if (!wallet) return
 
@@ -38,7 +36,7 @@ export default function Home() {
       if (error) return
       console.log(sig)
       setAccounts(sig)
-      setCurrentAccount(sig[0])
+      setCurrentAccount(sig.find((s: any) => s.threadId == router.query.default))
     }
     run()
 
@@ -146,7 +144,7 @@ export default function Home() {
 
             <Divider borderColor="#242D45" />
             <Text fontSize="30px" fontWeight={500} color="#898DA4">Earning 2.5% minute return</Text>
-            <Text fontSize="30px" fontWeight={400} color="#464854">Balance updating every 10 seconds</Text>
+            <Text fontSize="30px" fontWeight={400} color="#464854" fontStyle="italic">Balance updating every 10 seconds</Text>
           </Flex>
 
           <Flex minH="50vh" p="2rem" gap="2rem" borderRadius="20px" bg="#0A0E1A" width="45%" flexFlow="column" justify="center" align="center">
