@@ -15,15 +15,15 @@
 
 ## 📗 Learn
 
-In this workshop, we'll learn about on-chain automation using Clockwork by simulation interest returns in bank account. In real life, banks have around 2.5% - 7% interest returns annually. In our program however, we'll be implementing 5% returns per minute, just to display the balance change considerably enough, otherwise, we'd need to wait for a long time for the us to get noticiable balance change with real world interest rate!
+In this workshop, we'll learn about on-chain automation using Clockwork by simulating interest returns in bank account. In real life, banks offer interest rates of around 2.5% - 7% annually. In our program however, we'll be implementing 5% returns per minute, just to display the balance change considerably enough, otherwise, we would need to wait for a long time to notice a significant change in the balance with the real-world interest rate.
 
 ### Automation
 
-We'll be using [Clockwork](https://www.clockwork.xyz/) for running a cron job that updates our balance with interest returns every 10 seconds. In real world, interest returns are deposit on a similar periodic basis, the interval however is large, like monthly or quaraterly. We'll be depositing every 10 seconds to see changes quickly for understanding.
+We'll be using [Clockwork](https://www.clockwork.xyz/) for running a cron job that updates our balance with interest returns every 10 seconds. In the real world, interest returns are deposited on a periodic basis, the interval however is large, like monthly or quaraterly. We'll be depositing every 10 seconds to quickly observe changes and improve our understanding.
 
 Clockwork has a thing called [Threads](https://docs.clockwork.xyz/developers/threads), which trigger certain instruction based on a certain trigger condition. For our case, the trigger condition is a cronjob every 10 seconds.
 
-One important thing about our dApp is that, after around 5 minutes, our interest returns would stop, the reason for that is that Clockwork requires some amount of fee to run each automation transaction. In our program, we're defining a very small fee. We can increase it for our automation to work for longer!
+One important thing about our dApp is that our interest returns will stop after about 5 minutes, the reason for that is that Clockwork requires some amount of fee to run each automation transaction. In our program, we're defining a very small fee. We can increase it to enable our automation to work for a longer time!
 
 ### Anchor Program
 
@@ -50,7 +50,7 @@ Let's go through the code and understand how our program works.
 
 First of all, open up [program/programs/program/src/lib.rs](program/programs/program/src/lib.rs)
 
-In the starting few lines, we're defining some really important constants. Let's have a look.
+In the first few lines, we're defining some really important constants. Let's have a look.
 
 ```rust
 // Line 13
@@ -76,8 +76,7 @@ pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
 ```
 We have defined our minute interest first. This is the amount of interest returns we want. You can change it to any amount you want.
 
-Then, we have some seeds defined, we'll be using these seeds multiple times in our program, so defining them in seperate constants is a better practice for readability and easy access if we wanted to change it.
-
+Then, we have some seeds defined, we'll be using these seeds multiple times in our program, so defining them as separate constants is a better practice for readability and easy access if we wanted to change it.
 
 ----
 
@@ -121,7 +120,7 @@ pub struct Initialize<'info> {
 We have first defined our `bank_account`, which is derived using our bank account seed constant and a thread id.
 The thread id here is the automation thread by Clockwork who's Id we're passing.
 
-Along with System program, we also need to pass Clock program for this to work. Hence we're using `clockwork_program` account as well.
+Along with System program, we also need to pass Clock program for this to work. Hence, we're using `clockwork_program` account as well.
 
 At the bottom, we have our `thread` account and the thread accounts `thread_authority`, these are also mandatory accounts for our threads to work.
 
@@ -203,12 +202,11 @@ The important part is how our automation is defined and triggered. We need three
 2. Automation Trigger
 3. CPI to Thread
 
-We're targetting the `add_interest` instruction and it's context `AddInterest` for our automation, we'll learn about them in detail later.
+We're targeting the `add_interest` instruction, and it's context `AddInterest` for our automation, we'll learn about them in detail later.
 
 Then, we've defined our trigger, which is a simple cron job for us. It's using the `CRON_SCHEDULE` constant we defined earlier.
 
 Finally, we're making a CPI to clockwork thread, starting at line 69.
-
 
 ----
 
@@ -230,7 +228,7 @@ We're simply taking in the thread_id, that is being used in our `UpdateBalance` 
 We're first making sure deposit balance amount is not in negative using the if condition.
 
 #### 3.2 Withdrawing Amount
-Defined in line 100, our withdraw function is almost identical to deposit function. We're just subtracting the amount instead of adding here.
+Defined in line 100, our `withdraw` function is almost identical to the `deposit` function. We're just subtracting the amount instead of adding here.
 
 ### Client Code
 
@@ -351,7 +349,7 @@ Look at the array in the code snippet above.
 
 Under the hood, `all` method is calling Solana JSON RPC's `getProgramAccounts` method. You can check out [Solana CookBook's Guide](https://solanacookbook.com/guides/get-program-accounts.html#facts) to understand it in more depth!
 
-But for now, to keep it simple. The `memcmp` filter, standing for memory comparison helps us comparing specific value in bytes on it's position. 
+But for now, to keep it simple. The `memcmp` filter, standing for memory comparison helps us comparing specific value in bytes on its position. 
 
 #### 3.2 Filters in detail
 
@@ -368,7 +366,7 @@ pub thread_id: Vec<u8>,
 pub bump: u8,
 ```
 
-The first `8` byte space is for discrimintor, we have to add it everytime when fetching data. Then, we have specific byte values for all values in our account struct. In order to get the value `holder`, which is after discriminator, we need to shift bytes by 8 + 8. That is the **offset** you see in the TypeScript code snippet in the [section above](#3.1-fetching-our-bank-account)
+The first `8` byte space is for discriminator, we have to add it every time when fetching data. Then, we have specific byte values for all values in our account struct. In order to get the value `holder`, which is after discriminator, we need to shift bytes by 8 + 8. That is the **offset** you see in the TypeScript code snippet in the [section above](#3.1-fetching-our-bank-account)
 
 We just need to define the correct offset for the byte data we are looking at, and then add the actual byte data itself, which is the user's public key in this case.
 
