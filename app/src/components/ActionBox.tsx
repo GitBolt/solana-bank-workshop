@@ -36,6 +36,7 @@ export const ActionBox = ({
           <NumberInputField
             placeholder="Enter amount"
             fontSize="lg"
+            h='3rem'
             color="white"
             borderColor="gray.700"
             _hover={{ borderColor: "white" }}
@@ -57,16 +58,16 @@ export const ActionBox = ({
           colorScheme="green"
           borderRadius="xl"
           onClick={onDeposit}
-          fontSize="lg"
+          fontSize="2xl"
           width="60%"
-          h="3rem"
+          h="3.5rem"
 
         >
           Deposit Funds
         </Button>
       </FormControl>
 
-      <Divider my="6" borderColor="gray.700" />
+      <Divider my="20" borderColor="gray.700" />
 
       <FormControl>
         <FormLabel color="white" fontSize="lg">
@@ -82,6 +83,7 @@ export const ActionBox = ({
             placeholder="Enter amount"
             fontSize="lg"
             color="white"
+            h='3rem'
             borderColor="gray.700"
             _hover={{ borderColor: "white" }}
             _focus={{ outline: "none", borderColor: "red.500" }}
@@ -102,9 +104,9 @@ export const ActionBox = ({
           colorScheme="blue"
           borderRadius="xl"
           onClick={onWithdraw}
-          fontSize="lg"
+          fontSize="2xl"
           width="60%"
-          h="3rem"
+          h="3.5rem"
 
         >
           Withdraw Funds

@@ -67,16 +67,39 @@ export default function Home() {
 
     return () => clearInterval(interval)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentAccount])
 
   const onDeposit = async () => {
     const res = await addBalance(wallet as NodeWallet, currentAccount.threadId, num)
-    console.log(res)
+    if (res.error) {
+      toast({
+        status: "error",
+        title: res.error
+      })
+      return
+    }
+
+    toast({
+      status: "success",
+      title: "Tx: " + res.sig
+    })
   }
 
   const onWithdraw = async () => {
     const res = await removeBalance(wallet as NodeWallet, currentAccount.threadId, num)
-    console.log(res)
+    if (res.error) {
+      toast({
+        status: "error",
+        title: res.error
+      })
+      return
+    }
+
+    toast({
+      status: "success",
+      title: "Tx: " + res.sig
+    })
   }
 
 
@@ -114,7 +137,7 @@ export default function Home() {
         <Flex gap="1rem" bg="#05070D" justify="space-around" align="center" w="100%">
 
           <Box bg="#0A0E1A" p="2rem" borderRadius="20px" width="45%" minH="60vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center" boxShadow="md">
-            <Text mt="40px" fontSize="4rem" fontWeight="bold" color="white" textAlign="center">Welcome, {currentAccount ? currentAccount.holderName : "..."}</Text>
+            <Text mt="40px" fontSize="3rem" fontWeight="bold" color="white" textAlign="center">Welcome, {currentAccount ? currentAccount.holderName : "..."}</Text>
             <Divider borderColor="#242D45" my="2rem" />
             <Flex justify="center" w="100%">
               <Box mr="3rem" textAlign="center">
@@ -124,18 +147,18 @@ export default function Home() {
             </Flex>
             <Divider borderColor="#242D45" my="2rem" />
             <Box textAlign="center">
-              <Text fontSize="2xl" fontWeight="semibold" color="#898DA4" mb="0.5rem">Earning 5% minute return</Text>
-              <Text fontSize="2xl" fontWeight="light" color="#464854" fontStyle="italic">Balance updating every 10 seconds</Text>
+              <Text fontSize="3xl" fontWeight="semibold" color="#898DA4" mb="0.5rem">Earning 5% minute return</Text>
+              <Text fontSize="3xl" fontWeight="light" color="#464854" fontStyle="italic">Balance updating every 10 seconds</Text>
             </Box>
           </Box>
 
-          
-          <ActionBox 
-          onDeposit={onDeposit}
-          onWithdraw={onWithdraw}
-          setNum={setNum}
+
+          <ActionBox
+            onDeposit={onDeposit}
+            onWithdraw={onWithdraw}
+            setNum={setNum}
           />
-  
+
 
         </Flex>
       </Flex >
