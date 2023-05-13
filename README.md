@@ -81,7 +81,7 @@ Then, we have some seeds defined, we'll be using these seeds multiple times in o
 ----
 
 #### 2.1 Defining InitilizeAccount context
-Scroll down to line 152 and see this:
+Scroll down to line 152 (in [program/programs/program/src/lib.rs](program/programs/program/src/lib.rs)) and see this:
 ```rs
 #[derive(Accounts)]
 #[instruction(thread_id: Vec<u8>)]
@@ -229,6 +229,35 @@ We're first making sure deposit balance amount is not in negative using the if c
 
 #### 3.2 Withdrawing Amount
 Defined in line 100, our `withdraw` function is almost identical to the `deposit` function. We're just subtracting the amount instead of adding here.
+
+#### 3.3 Adding Interest
+We're using simple compound interest formula in our program to add interest. 
+Head over to [program/programs/program/src/lib.rs](program/programs/program/src/lib.rs)
+Check line 111:
+
+```rs
+pub fn add_interest(ctx: Context<AddInterest>, _thread_id: Vec<u8>) -> Result<()> {
+    let now = Clock::get().unwrap().unix_timestamp;
+
+    let bank_account = &mut ctx.accounts.bank_account;
+    bank_account.updated_at = now;
+
+    let elapsed_time = (now - bank_account.created_at) as f64;
+    let minutes = elapsed_time / 60.0;
+    let accumulated_value = bank_account.balance * (1.0 + (MINUTE_INTEREST)).powf(minutes);
+    bank_account.balance = accumulated_value;
+
+    msg!(
+        "New Balance: {}, Minutes Elasped when Called: {}",
+        accumulated_value,
+        minutes,
+    );
+    Ok(())
+}
+```
+
+Our `add_interest` instruction simply accepts a thread id, which is used in the context to derive our bank account.
+We're essentially getting the time at which this instruction is called, subtracting it with bank's creation time to get time elasped, and then using compound interest formula to get our final `accumulated_value` and setting it to user's balance. We're also logging this using `msg` macro for debugging purposes.
 
 ### Client Code
 
