@@ -1,12 +1,8 @@
 import * as anchor from '@project-serum/anchor'
-import { PublicKey, SystemProgram } from '@solana/web3.js';
-import { ClockworkProvider } from "@clockwork-xyz/sdk";
 import { anchorProgram } from '@/util/helper';
 
 export const getBankAccount = async (
   wallet: anchor.Wallet,
-  // holderName: string,
-  // initialDeposit: number,
 ) => {
   const program = anchorProgram(wallet);
 

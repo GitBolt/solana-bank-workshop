@@ -6,11 +6,13 @@ type Props = {
   setNum: React.Dispatch<React.SetStateAction<number>>
   onDeposit: React.Dispatch<React.SetStateAction<any>>
   onWithdraw: React.Dispatch<React.SetStateAction<any>>
+  onDelete: React.Dispatch<React.SetStateAction<any>>
 }
 export const ActionBox = ({
   setNum,
   onDeposit,
   onWithdraw,
+  onDelete
 }: Props) => {
   return (
     <Box
@@ -67,7 +69,7 @@ export const ActionBox = ({
         </Button>
       </FormControl>
 
-      <Divider my="20" borderColor="gray.700" />
+      <Divider my="5" borderColor="gray.700" />
 
       <FormControl>
         <FormLabel color="white" fontSize="lg">
@@ -110,6 +112,27 @@ export const ActionBox = ({
 
         >
           Withdraw Funds
+        </Button>
+      </FormControl>
+
+
+      <Divider my="5" borderColor="gray.700" />
+
+      <FormControl>
+        <FormLabel color="white" fontSize="lg">
+          Delete Account
+        </FormLabel>
+
+        <Button
+          mt="4"
+          colorScheme="red"
+          borderRadius="xl"
+          onClick={onDelete}
+          fontSize="2xl"
+          width="60%"
+          h="3.5rem"
+        >
+          Delete Account
         </Button>
       </FormControl>
     </Box>

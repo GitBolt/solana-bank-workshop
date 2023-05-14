@@ -37,7 +37,6 @@ pub mod bank {
         bank_account.balance = balance;
         bank_account.holder_name = holder_name;
         bank_account.created_at = Clock::get().unwrap().unix_timestamp;
-        bank_account.updated_at = Clock::get().unwrap().unix_timestamp;
 
         // Clockwork Target Instruction
         let target_ix = Instruction {
@@ -122,7 +121,7 @@ pub mod bank {
         Ok(())
     }
 
-    pub fn remove(ctx: Context<Remove>) -> Result<()> {
+    pub fn remove_account(ctx: Context<RemoveAccount>, _thread_id: Vec<u8>) -> Result<()> {
         // Accounts
         let clockwork_program = &ctx.accounts.clockwork_program;
         let holder = &ctx.accounts.holder;
@@ -198,14 +197,14 @@ pub struct AddInterest<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(thread_id : Vec<u8>)]
-pub struct Remove<'info> {
+#[instruction(_thread_id : Vec<u8>)]
+pub struct RemoveAccount<'info> {
     #[account(mut)]
     pub holder: Signer<'info>,
 
     #[account(
         mut,
-        seeds = [BANK_ACCOUNT_SEED, thread_id.as_ref()],
+        seeds = [BANK_ACCOUNT_SEED, _thread_id.as_ref()],
         bump,
         close = holder
     )]
@@ -227,9 +226,9 @@ pub struct BankAccount {
     pub holder: Pubkey,
     pub holder_name: String,
     pub balance: f64,
+    pub thread_id: Vec<u8>,
     pub created_at: i64,
     pub updated_at: i64,
-    pub thread_id: Vec<u8>,
 }
 
 #[error_code]

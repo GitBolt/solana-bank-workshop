@@ -15,8 +15,8 @@ import { ChevronDownIcon } from '@chakra-ui/icons'
 import { anchorProgram } from '@/util/helper'
 import { removeBalance } from '@/util/program/removeBalance'
 import { ActionBox } from '@/components/ActionBox'
+import { deleteAccount } from '@/util/program/deleteBankAccount'
 
-const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
 
@@ -48,17 +48,21 @@ export default function Home() {
 
     if (!currentAccount) return
     const run = async () => {
-      // @ts-ignore
-      const newData = await anchorProgram(wallet as NodeWallet).account.bankAccount.fetch(currentAccount.pubKey)
-      console.log("Fresh Data: ", newData)
-      setCurrentAccount({
-        balance: newData.balance,
-        createdAt: newData.createdAt.toNumber(),
-        holderName: newData.holderName,
-        updatedAt: newData.updatedAt.toNumber(),
-        threadId: newData.threadId ? Buffer.from(newData.threadId).toString() : '',
-        pubKey: currentAccount.pubKey,
-      })
+      try {
+        // @ts-ignore
+        const newData = await anchorProgram(wallet as NodeWallet).account.bankAccount.fetch(currentAccount.pubKey)
+        console.log("Fresh Data: ", newData)
+        setCurrentAccount({
+          balance: newData.balance,
+          createdAt: newData.createdAt.toNumber(),
+          holderName: newData.holderName,
+          updatedAt: newData.updatedAt.toNumber(),
+          threadId: newData.threadId ? Buffer.from(newData.threadId).toString() : '',
+          pubKey: currentAccount.pubKey,
+        })
+      } catch (e) {
+        console.log(e)
+      }
     }
 
     const interval = setInterval(() => {
@@ -67,7 +71,7 @@ export default function Home() {
 
     return () => clearInterval(interval)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentAccount])
 
   const onDeposit = async () => {
@@ -102,7 +106,22 @@ export default function Home() {
     })
   }
 
+  const onDelete = async () => {
+    const res = await deleteAccount(wallet as NodeWallet, currentAccount.threadId)
+    if (res.error) {
+      toast({
+        status: "error",
+        title: res.error
+      })
+      return
+    }
 
+    toast({
+      status: "success",
+      title: "Tx: " + res.sig
+    })
+    router.push("/")
+  }
 
   return (
     <>
@@ -157,9 +176,8 @@ export default function Home() {
             onDeposit={onDeposit}
             onWithdraw={onWithdraw}
             setNum={setNum}
+            onDelete={onDelete}
           />
-
-
         </Flex>
       </Flex >
 

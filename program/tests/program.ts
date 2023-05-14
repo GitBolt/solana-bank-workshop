@@ -15,7 +15,6 @@ describe("Bank Simulator", async () => {
   const program = anchor.workspace.Etracker as Program<Bank>;
   const wallet = provider.wallet as anchor.Wallet;
 
-
   const clockworkProvider = ClockworkProvider.fromAnchorProvider(
     program.provider as AnchorProvider
   );
@@ -33,6 +32,7 @@ describe("Bank Simulator", async () => {
     threadAuthority,
     threadId
   );
+
   console.log("Thread ID: ", threadId);
   console.log("Bank Account: ", bank_account.toBase58());
   console.log("Thread Authority: ", threadAuthority.toBase58());
@@ -81,7 +81,7 @@ describe("Bank Simulator", async () => {
 
   it("Delete Account", async () => {
     await program.methods
-      .removeInterest(Buffer.from(threadId))
+      .removeAccount(Buffer.from(threadId))
       .accounts({
         holder: wallet.publicKey,
         bankAccount: bank_account,

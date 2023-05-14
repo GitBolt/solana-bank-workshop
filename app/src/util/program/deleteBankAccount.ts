@@ -1,12 +1,11 @@
 import * as anchor from '@project-serum/anchor'
-import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { ClockworkProvider } from "@clockwork-xyz/sdk";
 import { anchorProgram } from '@/util/helper';
 
-export const openBankAccount = async (
+export const deleteAccount = async (
   wallet: anchor.Wallet,
-  holderName: string,
-  initialDeposit: number,
+  threadId: Uint8Array,
 ) => {
 
   const program = anchorProgram(wallet);
@@ -15,10 +14,9 @@ export const openBankAccount = async (
     program.provider as anchor.AnchorProvider
   );
 
-  const threadId = "bank_account-" + new Date().getTime() / 1000;
 
   const [bank_account] = PublicKey.findProgramAddressSync(
-    [Buffer.from("bank_account"), Buffer.from(threadId)],
+    [anchor.utils.bytes.utf8.encode("bank_account"), Buffer.from(threadId)],
     program.programId
   );
 
@@ -28,21 +26,20 @@ export const openBankAccount = async (
   );
   const [threadAddress] = clockworkProvider.getThreadPDA(
     threadAuthority,
-    threadId
+    Buffer.from(threadId).toString()
   );
 
   try {
-    const ix = await program.methods.initializeAccount(Buffer.from(threadId), holderName, Number(initialDeposit.toFixed(2)))
+    const sig = await program.methods.removeAccount(Buffer.from(threadId))
       .accounts({
-        bankAccount: bank_account,
         holder: wallet.publicKey,
-
+        bankAccount: bank_account,
         thread: threadAddress,
         threadAuthority: threadAuthority,
         clockworkProgram: clockworkProvider.threadProgram.programId,
       }).rpc()
 
-    return { error: false, sig: ix, threadId }
+    return { error: false, sig }
 
   } catch (e: any) {
     console.log(e)
