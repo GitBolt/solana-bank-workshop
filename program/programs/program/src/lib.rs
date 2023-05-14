@@ -1,15 +1,12 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::{self};
-use anchor_lang::solana_program::{
-    instruction::Instruction, native_token::LAMPORTS_PER_SOL, system_program,
-};
+use anchor_lang::solana_program::{instruction::Instruction, native_token::LAMPORTS_PER_SOL};
 use anchor_lang::InstructionData;
 use clockwork_sdk::state::{Thread, ThreadAccount};
 
 declare_id!("5mP16ymxF7Ac2hw85oAzCJUUnu9deUvYTyWhaQ4M7H39");
 
 // Calculating interest per minute instead of anually for faster results
-const MINUTE_INTEREST: f64 = 0.05; // 2.5% interest return
+const MINUTE_INTEREST: f64 = 0.05; // 5% interest return
 const CRON_SCHEDULE: &str = "*/10 * * * * * *"; // 10s https://crontab.guru/
 const AUTOMATION_FEE: f64 = 0.05; // https://docs.clockwork.xyz/developers/threads/fees
 
@@ -26,7 +23,6 @@ pub mod bank {
         holder_name: String,
         balance: f64,
     ) -> Result<()> {
-        // Accounts
         let system_program = &ctx.accounts.system_program;
         let clockwork_program = &ctx.accounts.clockwork_program;
 
@@ -36,7 +32,6 @@ pub mod bank {
         let thread = &ctx.accounts.thread;
         let thread_authority = &ctx.accounts.thread_authority;
 
-        // Assigning init data
         bank_account.thread_id = thread_id.clone();
         bank_account.holder = *holder.key;
         bank_account.balance = balance;
@@ -127,7 +122,7 @@ pub mod bank {
         Ok(())
     }
 
-    pub fn remove_interest(ctx: Context<Reset>) -> Result<()> {
+    pub fn remove(ctx: Context<Remove>) -> Result<()> {
         // Accounts
         let clockwork_program = &ctx.accounts.clockwork_program;
         let holder = &ctx.accounts.holder;
@@ -152,7 +147,9 @@ pub mod bank {
 #[derive(Accounts)]
 #[instruction(thread_id: Vec<u8>)]
 pub struct Initialize<'info> {
-    /// The counter account to initialize.
+    #[account(mut)]
+    pub holder: Signer<'info>,
+
     #[account(
         init,
         payer = holder,
@@ -162,24 +159,16 @@ pub struct Initialize<'info> {
     )]
     pub bank_account: Account<'info, BankAccount>,
 
-    /// The Clockwork thread program.
-    #[account(address = clockwork_sdk::ID)]
-    pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
-
-    #[account(mut)]
-    pub holder: Signer<'info>,
-
-    /// The Solana system program.
-    #[account(address = system_program::ID)]
-    pub system_program: Program<'info, System>,
-
-    /// Address to assign to the newly created thread.
     #[account(mut, address = Thread::pubkey(thread_authority.key(), thread_id))]
     pub thread: SystemAccount<'info>,
 
-    /// The pda that will own and manage the thread.
     #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
     pub thread_authority: SystemAccount<'info>,
+
+    #[account(address = clockwork_sdk::ID)]
+    pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
+
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -192,10 +181,7 @@ pub struct UpdateBalance<'info> {
     pub bank_account: Account<'info, BankAccount>,
 
     // Misc Accounts
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
-    #[account(address = solana_program::sysvar::rent::ID)]
-    pub rent: Sysvar<'info, Rent>,
 }
 
 #[derive(Accounts)]
@@ -213,24 +199,10 @@ pub struct AddInterest<'info> {
 
 #[derive(Accounts)]
 #[instruction(thread_id : Vec<u8>)]
-pub struct Reset<'info> {
-    /// The signer.
+pub struct Remove<'info> {
     #[account(mut)]
     pub holder: Signer<'info>,
 
-    /// The Clockwork thread program.
-    #[account(address = clockwork_sdk::ID)]
-    pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
-
-    /// The thread to reset.
-    #[account(mut, address = thread.pubkey(), constraint = thread.authority.eq(&thread_authority.key()))]
-    pub thread: Account<'info, Thread>,
-
-    /// The pda that owns and manages the thread.
-    #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
-    pub thread_authority: SystemAccount<'info>,
-
-    /// Close the counter account
     #[account(
         mut,
         seeds = [BANK_ACCOUNT_SEED, thread_id.as_ref()],
@@ -238,6 +210,15 @@ pub struct Reset<'info> {
         close = holder
     )]
     pub bank_account: Account<'info, BankAccount>,
+
+    #[account(mut, address = thread.pubkey(), constraint = thread.authority.eq(&thread_authority.key()))]
+    pub thread: Account<'info, Thread>,
+
+    #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
+    pub thread_authority: SystemAccount<'info>,
+
+    #[account(address = clockwork_sdk::ID)]
+    pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
 }
 
 #[account]
@@ -249,7 +230,6 @@ pub struct BankAccount {
     pub created_at: i64,
     pub updated_at: i64,
     pub thread_id: Vec<u8>,
-    pub bump: u8,
 }
 
 #[error_code]
