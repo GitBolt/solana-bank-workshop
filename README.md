@@ -19,9 +19,9 @@ In this workshop, we'll learn about on-chain automation using Clockwork by simul
 
 ### Automation
 
-We'll be using [Clockwork](https://www.clockwork.xyz/) for running a cron job that updates our balance with interest returns every 10 seconds. In the real world, interest returns are deposited on a periodic basis, the interval however is large, like monthly or quaraterly. We'll be depositing every 10 seconds to quickly observe changes and improve our understanding.
+We'll be using [Clockwork](https://www.clockwork.xyz/) for running a cron job that updates our balance with interest returns every 10 seconds. In the real world, interest returns are deposited on a periodic basis, the interval however is large, like quarterly or yearly. We'll be depositing every 10 seconds to quickly observe changes and understand better.
 
-Clockwork has a thing called [Threads](https://docs.clockwork.xyz/developers/threads), which trigger certain instruction based on a certain trigger condition. For our case, the trigger condition is a cronjob every 10 seconds.
+Clockwork has a thing called [Threads](https://docs.clockwork.xyz/developers/threads), which trigger certain instruction based on a certain trigger condition. For our case, the trigger condition is a Cronjob every 10 seconds.
 
 One important thing about our dApp is that our interest returns will stop after about 5 minutes, the reason for that is that Clockwork requires some amount of fee to run each automation transaction. In our program, we're defining a very small fee. We can increase it to enable our automation to work for a longer time!
 
@@ -118,11 +118,11 @@ pub struct Initialize<'info> {
 ```
 
 We have first defined our `bank_account`, which is derived using our bank account seed constant and a thread id.
-The thread id here is the automation thread by Clockwork who's Id we're passing.
+The thread id here is the automation thread by Clockwork whose Id we're passing.
 
-Along with System program, we also need to pass Clock program for this to work. Hence, we're using `clockwork_program` account as well.
+Along with System program, we also need to pass Clockwork program for this to work. Hence, we're using `clockwork_program` account as well.
 
-At the bottom, we have our `thread` account and the thread accounts `thread_authority`, these are also mandatory accounts for our threads to work.
+At the bottom, we have our `thread` account and the thread account's `thread_authority`, these are also mandatory accounts for our threads to work.
 
 #### 2.2 Defining Clockwork Target Instruction and Trigger
 This is one of the most important parts of our program. Have a deep look into our `initialize_account` instruction starting at line 23:
@@ -395,7 +395,7 @@ pub thread_id: Vec<u8>,
 pub bump: u8,
 ```
 
-The first `8` byte space is for discriminator, we have to add it every time when fetching data. Then, we have specific byte values for all values in our account struct. In order to get the value `holder`, which is after discriminator, we need to shift bytes by 8 + 8. That is the **offset** you see in the TypeScript code snippet in the [section above](#31-fetching-our-bank-account)
+The first `8` byte space is for discriminator, we have to add it every time when fetching data. Then, we have specific byte values for all values in our account struct. In order to get the value `holder`, which is after discriminator, we need to shift bytes by 8. That is the **offset** you see in the TypeScript code snippet in the [section above](#31-fetching-our-bank-account)
 
 We just need to define the correct offset for the byte data we are looking at, and then add the actual byte data itself, which is the user's public key in this case.
 
