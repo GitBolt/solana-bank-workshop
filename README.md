@@ -53,10 +53,10 @@ First of all, open up [program/programs/program/src/lib.rs](program/programs/pro
 In the first few lines, we're defining some really important constants. Let's have a look.
 
 ```rust
-// Line 13
+// Line 9
 
+const MINUTE_INTEREST: f64 = 0.05; // 5% interest return
 const CRON_SCHEDULE: &str = "*/10 * * * * * *"; // 10s https://crontab.guru/
-const AUTOMATION_FEE: f64 = 0.05; // https://docs.clockwork.xyz/developers/threads/fees
 
 ```
 We first have `CRON_SCHEDULE` constant defined. This format may look confusing, so in order to create your own schedule time, you can use [CronTab Tool](https://crontab.guru/)
@@ -68,25 +68,24 @@ Then, we have our `AUTOMATION_FEE`, this is the fee we can deposit to our Clockw
 Have a look into these:
 
 ```rs
-// Line 12 and Line 16
+// Line 13
 
-const MINUTE_INTEREST: f64 = 0.05; // 0.05% interest return
 pub const BANK_ACCOUNT_SEED: &[u8] = b"bank_account";
 pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
 ```
-We have defined our minute interest first. This is the amount of interest returns we want. You can change it to any amount you want.
-
-Then, we have some seeds defined, we'll be using these seeds multiple times in our program, so defining them as separate constants is a better practice for readability and easy access if we wanted to change it.
+We have some seeds defined, we'll be using these seeds multiple times in our program, so defining them as separate constants is a better practice for readability and easy access if we wanted to change it.
 
 ----
 
 #### 2.1 Defining InitilizeAccount context
-Scroll down to line 152 (in [program/programs/program/src/lib.rs](program/programs/program/src/lib.rs)) and see this:
+Scroll down to line 146 (in [program/programs/program/src/lib.rs](program/programs/program/src/lib.rs)) and see this:
 ```rs
 #[derive(Accounts)]
 #[instruction(thread_id: Vec<u8>)]
 pub struct Initialize<'info> {
-    /// The counter account to initialize.
+    #[account(mut)]
+    pub holder: Signer<'info>,
+
     #[account(
         init,
         payer = holder,
@@ -96,24 +95,16 @@ pub struct Initialize<'info> {
     )]
     pub bank_account: Account<'info, BankAccount>,
 
-    /// The Clockwork thread program.
-    #[account(address = clockwork_sdk::ID)]
-    pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
-
-    #[account(mut)]
-    pub holder: Signer<'info>,
-
-    /// The Solana system program.
-    #[account(address = system_program::ID)]
-    pub system_program: Program<'info, System>,
-
-    /// Address to assign to the newly created thread.
     #[account(mut, address = Thread::pubkey(thread_authority.key(), thread_id))]
     pub thread: SystemAccount<'info>,
 
-    /// The pda that will own and manage the thread.
     #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
     pub thread_authority: SystemAccount<'info>,
+
+    #[account(address = clockwork_sdk::ID)]
+    pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
+
+    pub system_program: Program<'info, System>,
 }
 ```
 
@@ -125,7 +116,7 @@ Along with System program, we also need to pass Clockwork program for this to wo
 At the bottom, we have our `thread` account and the thread account's `thread_authority`, these are also mandatory accounts for our threads to work.
 
 #### 2.2 Defining Clockwork Target Instruction and Trigger
-This is one of the most important parts of our program. Have a deep look into our `initialize_account` instruction starting at line 23:
+This is one of the most important parts of our program. Have a deep look into our `initialize_account` instruction starting at line 20:
 
 ```rs
 pub fn initialize_account(
@@ -134,7 +125,6 @@ pub fn initialize_account(
     holder_name: String,
     balance: f64,
 ) -> Result<()> {
-    // Accounts
     let system_program = &ctx.accounts.system_program;
     let clockwork_program = &ctx.accounts.clockwork_program;
 
@@ -144,13 +134,11 @@ pub fn initialize_account(
     let thread = &ctx.accounts.thread;
     let thread_authority = &ctx.accounts.thread_authority;
 
-    // Assigning init data
     bank_account.thread_id = thread_id.clone();
     bank_account.holder = *holder.key;
     bank_account.balance = balance;
     bank_account.holder_name = holder_name;
     bank_account.created_at = Clock::get().unwrap().unix_timestamp;
-    bank_account.updated_at = Clock::get().unwrap().unix_timestamp;
 
     // Clockwork Target Instruction
     let target_ix = Instruction {
@@ -195,6 +183,7 @@ pub fn initialize_account(
     Ok(())
 }
 ```
+
 This instruction takes in the unique thread id, account holder's name and the initial deposit amount as the `balance` parameter.
 
 The important part is how our automation is defined and triggered. We need three things for Clockwork automation to work:
@@ -211,7 +200,8 @@ Finally, we're making a CPI to clockwork thread, starting at line 69.
 ----
 
 #### 3.1 Depositing Amount
-Our deposit instruction is fairly simple, navigate to line 90:
+Our deposit instruction is fairly simple, navigate to line 84:
+
 ```rs
 pub fn deposit(ctx: Context<UpdateBalance>, _thread_id: Vec<u8>, amount: f64) -> Result<()> {
     if amount < 0.0 {
@@ -228,7 +218,7 @@ We're simply taking in the thread_id, that is being used in our `UpdateBalance` 
 We're first making sure deposit balance amount is not in negative using the if condition.
 
 #### 3.2 Withdrawing Amount
-Defined in line 100, our `withdraw` function is almost identical to the `deposit` function. We're just subtracting the amount instead of adding here.
+Defined in line 94, our `withdraw` function is almost identical to the `deposit` function. We're just subtracting the amount instead of adding here.
 
 #### 3.3 Adding Interest
 We're using simple compound interest formula in our program to add interest. 
@@ -342,7 +332,7 @@ Next, we're deriving threadAuthority PDA using the string "authority". We're the
 #### 2.2 Depositing and Withdrawing
 Open up [/app/src/util/program/addBalance.ts](/app/src/util/program/addBalance.ts)
 We're simply passing the unique `threadId` and our bank account PDA, along with the amount we want to deposit.
-Check ine 34:
+Check ine 19:
 ```ts
 const sig = await program.methods.deposit(Buffer.from(threadId), balance)
     .accounts({
@@ -362,7 +352,7 @@ You'll notice that just like how our withdraw and deposit program instructions w
 Now, it's the time we fetch our bank accounts. A user can have multiple bank accounts, just like in real world, we are not categorizing them like real world for simplicity.
 
 Open [/app/src/util/program/getBankAccount.ts](/app/src/util/program/getBankAccount.ts)
-Notice Line 15:
+Notice Line 11:
 
 ```ts
 const data = await program.account.bankAccount.all([
@@ -386,13 +376,14 @@ We define our account space according to this [Space Reference](https://book.anc
 
 Let's have a look at our Bank Account Struct again from Rust:
 ```rs
-pub holder: Pubkey,
-pub holder_name: String,
-pub balance: f64,
-pub created_at: i64,
-pub updated_at: i64,
-pub thread_id: Vec<u8>,
-pub bump: u8,
+pub struct BankAccount {
+    pub holder: Pubkey,
+    pub holder_name: String,
+    pub balance: f64,
+    pub thread_id: Vec<u8>,
+    pub created_at: i64,
+    pub updated_at: i64,
+}
 ```
 
 The first `8` byte space is for discriminator, we have to add it every time when fetching data. Then, we have specific byte values for all values in our account struct. In order to get the value `holder`, which is after discriminator, we need to shift bytes by 8. That is the **offset** you see in the TypeScript code snippet in the [section above](#31-fetching-our-bank-account)
