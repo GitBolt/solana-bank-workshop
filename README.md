@@ -397,8 +397,8 @@ And that is it! It's that easy to fetch particular accounts through filters. If 
 
 1. You would need to deploy the program on Solana blockchain first. You can either:
     - Click on the [Solana Playground](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) link and deploy it
-    - Install [Anchor](https://www.anchor-lang.com/), Rust and Solana CLI. Then head over to `/anchor-program` directory and follow instructions from Anchor docs to deploy the program to devnet.
+    - Install [Anchor](https://www.anchor-lang.com/), Rust and Solana CLI. Then head over to `/program` directory and follow instructions from Anchor docs to deploy the program to devnet.
   
-2. To launch the frontend, head over to `/app/src` directory and enter: `yarn install && yarn dev`
+2. To launch the frontend, head over to `/app` directory and enter: `yarn install && yarn dev`
 
 If you're running on Localnet, you'd need to install Clockwork CLI and launch Clockwork localnet, check out [their docs](https://docs.clockwork.xyz/developers/localnet) for detailed guide!
