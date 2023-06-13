@@ -74,7 +74,7 @@ export default function Home() {
 
           <Flex flexFlow="column" w="80%">
             <Text fontSize="20px" color="#787792">Enter your Name</Text>
-            <Input color="white" fontSize="20px" onChange={(e) => setName(e.target.value)} border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
+            <Input color="white" maxLength={12} fontSize="20px" onChange={(e) => setName(e.target.value)} border="1px solid #30354F" bg="transparent" height="50px" w="100%" />
           </Flex>
 
           <Flex flexFlow="column" w="80%">

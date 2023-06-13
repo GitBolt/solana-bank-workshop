@@ -30,8 +30,9 @@ export const ActionBox = ({
           Deposit
         </FormLabel>
         <NumberInput
+          precision={2}
           onChange={(e) => setNum(Number(e))}
-          min={1}
+          min={0.01}
           borderRadius="xl"
           colorScheme="green"
         >
@@ -76,8 +77,9 @@ export const ActionBox = ({
           Withdraw
         </FormLabel>
         <NumberInput
+          precision={2}
           onChange={(e) => setNum(Number(e))}
-          min={1}
+          min={0.01}
           borderRadius="xl"
           colorScheme="red"
         >

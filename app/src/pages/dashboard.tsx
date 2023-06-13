@@ -67,7 +67,7 @@ export default function Home() {
 
     const interval = setInterval(() => {
       run()
-    }, 10000)
+    }, 5000)
 
     return () => clearInterval(interval)
 

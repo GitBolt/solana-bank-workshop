@@ -8,11 +8,8 @@ export const getBankAccount = async (
 
   try {
     // @ts-ignore
-    const data = await program.account.bankAccount.all([
-      {
-        memcmp: { offset: 8, bytes: wallet.publicKey.toBase58() }
-      }
-    ])
+    const data = await program.account.bankAccount.all()
+    console.log(data)
     if (data && data.length) {
       const accounts = data.map((item: any) => {
         return (

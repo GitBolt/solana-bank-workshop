@@ -18,7 +18,6 @@ export const truncatedPublicKey = (publicKey: string, length?: number) => {
     };
     const connectionURI =
       rpc_url || process.env.NEXT_PUBLIC_RPC_URL || DEVNET_RPC
-  
     const connection = new anchor.web3.Connection(
       connectionURI,
       opts.preflightCommitment
