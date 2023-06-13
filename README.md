@@ -405,7 +405,7 @@ And that is it! It's that easy to fetch particular accounts through filters. If 
     - Install [Anchor](https://www.anchor-lang.com/), [Rust](https://www.rust-lang.org/tools/install) and [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) and [Clockwork CLI](https://docs.clockwork.xyz/welcome/installation)
     - Head over to `program/` directory using `cd program/` command.
     - Run `clockwork localnet`
-    - Then, open a new terminal instance and enter `anchor build` in the same directory.
+    - Then, open a new terminal instance and enter `anchor build` and `yarn install` in the same directory.
     - Then, enter `anchor deploy`, you'll get a program Id at the end, copy it and paste it in [declare_id macro](/program/programs/bank-simulator/src/lib.rs) and in [Anchor.toml localnet section](/program/Anchor.toml)
     - Finally, enter `anchor test --skip-local-validator` to build everything and run tests.
 
