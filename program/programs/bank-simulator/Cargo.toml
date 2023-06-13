@@ -1,12 +1,12 @@
 [package]
-name = "program"
+name = "bank-simulator"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "program"
+name = "bank_simulator"
 
 [features]
 no-entrypoint = []
@@ -16,5 +16,9 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = "0.27.0"
 clockwork-sdk = "2.0.17"
+anchor-lang ={version="0.27.0",  features = ["init-if-needed"]}
+solana-program = "=1.14.17"
+winnow = "=0.4.1"
+toml_datetime = "=0.6.1"
+arrayref = "0.3.7"

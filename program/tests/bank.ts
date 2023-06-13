@@ -1,28 +1,31 @@
 import { ClockworkProvider } from "@clockwork-xyz/sdk";
 import * as anchor from "@project-serum/anchor";
-import { Program } from "@project-serum/anchor";
-import { Bank } from "../target/types/bank";
-import { AnchorProvider } from "@coral-xyz/anchor";
+import { BankSimulator } from "../target/types/bank_simulator";
 
-describe("Bank Simulator", async () => {
-  const threadId = "bank_account-1";
-  const holderName = "test10";
-  const balance = 10.0;
+describe("bank", async () => {
 
-  anchor.setProvider(anchor.AnchorProvider.env());
+
+  const program = anchor.workspace.BankSimulator as anchor.Program<BankSimulator>;
+
   const provider = anchor.AnchorProvider.local();
+  anchor.setProvider(provider);
 
-  const program = anchor.workspace.Etracker as Program<Bank>;
   const wallet = provider.wallet as anchor.Wallet;
 
   const clockworkProvider = ClockworkProvider.fromAnchorProvider(
-    program.provider as AnchorProvider
+    provider
   );
+
+
+  const threadId = "bank_account-1";
+  const holderName = "test10";
+  const balance = 10.0;
 
   const [bank_account] = anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from("bank_account"), Buffer.from(threadId)],
     program.programId
   );
+
 
   const [threadAuthority] = anchor.web3.PublicKey.findProgramAddressSync(
     [anchor.utils.bytes.utf8.encode("authority")],
