@@ -3,7 +3,7 @@ use anchor_lang::solana_program::{instruction::Instruction, native_token::LAMPOR
 use anchor_lang::InstructionData;
 use clockwork_sdk::state::{Thread, ThreadAccount};
 
-declare_id!("2MJ58MfQn9ZUDvRdwdGLtEqf6JKRkrLidRRj6zLchb4g");
+declare_id!("B8Gwgafr5U1zn57i4KC1vr8z74qRJgXuZsbZeZYD3nTg");
 
 // Calculating interest per minute instead of anually for faster results
 const MINUTE_INTEREST: f64 = 0.05; // 5% interest return
@@ -45,10 +45,12 @@ pub mod bank_simulator {
                 bank_account: bank_account.key(),
                 thread: thread.key(),
                 thread_authority: thread_authority.key(),
-            }.to_account_metas(Some(true)),
+            }
+            .to_account_metas(Some(true)),
             data: crate::instruction::AddInterest {
                 _thread_id: thread_id.clone(),
-            }.data(),
+            }
+            .data(),
         };
 
         // Clockwork Trigger

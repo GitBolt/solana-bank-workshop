@@ -199,7 +199,7 @@ Then, we've defined our trigger, which is a simple cron job for us. It's using t
 
 Finally, we're making a CPI to clockwork thread, starting at line 69.
 
-> Note that in target_ix variable, we're getting `crate::accounts crate::instructions` from Anchor directly at compile time. This is how we're able to get `AddInterest` context accounts and data required without having to import them or anything similar.
+> Note that in target_ix variable, we're getting `crate::accounts` and `crate::instructions` from Anchor directly at compile time. This is how we're able to get `AddInterest` context accounts and data required without having to import them or do anything else.
 ----
 
 #### 3.1 Depositing Amount
@@ -402,16 +402,15 @@ And that is it! It's that easy to fetch particular accounts through filters. If 
  - SOLPg
    - Click on the [Solana Playground](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) link and deploy it
   - Working Locally
-    - Install [Anchor](https://www.anchor-lang.com/), [Rust](https://www.rust-lang.org/tools/install) and [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) and [Clockwork CLI](https://docs.clockwork.xyz/welcome/installation)
-    - Head over to `program/` directory using `cd program/` command.
+    - Install [Anchor](https://www.anchor-lang.com/), [Rust](https://www.rust-lang.org/tools/install) and [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) and [Clockwork CLI](https://docs.clockwork.xyz/welcome/installation) and clone this repository
     - Run `clockwork localnet`
-    - Then, open a new terminal instance and enter `anchor build` and `yarn install` in the same directory.
+    - Then, open a new terminal instance and head over to `program/` directory using `cd program/` command.
+    - Enter `anchor build` and `yarn install` in the same directory.
     - Then, enter `anchor deploy`, you'll get a program Id at the end, copy it and paste it in [declare_id macro](/program/programs/bank-simulator/src/lib.rs) and in [Anchor.toml localnet section](/program/Anchor.toml)
     - Finally, enter `anchor test --skip-local-validator` to build everything and run tests.
 
 > Note that you may have some issues using latest version of Solana CLI. It is recommend that you install Solana CLI version 1.14.18
+If you see blockhash keep expiring when you run `anchor deploy` or when running `anchor test`, then just stop your clockwork validator and re-start it. That will solve the issue.
   
 
-2. To launch the frontend, head over to `/app` directory and enter: `yarn install && yarn dev`
-
-If you're running on Localnet, you'd need to install Clockwork CLI and launch Clockwork localnet, check out [their docs](https://docs.clockwork.xyz/developers/localnet) for detailed guide!
+1. To launch the frontend, head over to `/app` directory and enter: `yarn install && yarn dev`

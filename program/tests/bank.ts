@@ -5,12 +5,12 @@ import { BankSimulator } from "../target/types/bank_simulator";
 describe("bank", async () => {
 
 
-  const program = anchor.workspace.BankSimulator as anchor.Program<BankSimulator>;
 
   const provider = anchor.AnchorProvider.local();
   anchor.setProvider(provider);
 
   const wallet = provider.wallet as anchor.Wallet;
+  const program = anchor.workspace.BankSimulator as anchor.Program<BankSimulator>;
 
   const clockworkProvider = ClockworkProvider.fromAnchorProvider(
     provider
