@@ -398,10 +398,20 @@ And that is it! It's that easy to fetch particular accounts through filters. If 
 
 ### How to Build & Run
 
-1. You would need to deploy the program on Solana blockchain first. You can either:
-    - Click on the [Solana Playground](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) link and deploy it
-    - Install [Anchor](https://www.anchor-lang.com/), Rust and Solana CLI. Then head over to `/program` directory and follow instructions from Anchor docs to deploy the program to devnet.
+1. You would need to deploy the program on Solana blockchain first. You can use SolPg to get started quickly or clone this and work locally:
+ - SOLPg
+   - Click on the [Solana Playground](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) link and deploy it
+  - Working Locally
+    - Install [Anchor](https://www.anchor-lang.com/), [Rust](https://www.rust-lang.org/tools/install) and [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) and [Clockwork CLI](https://docs.clockwork.xyz/welcome/installation)
+    - Head over to `program/` directory using `cd program/` command.
+    - Run `clockwork localnet`
+    - Then, open a new terminal instance and enter `anchor build` in the same directory.
+    - Then, enter `anchor deploy`, you'll get a program Id at the end, copy it and paste it in [declare_id macro](/program/programs/bank-simulator/src/lib.rs) and in [Anchor.toml localnet section](/program/Anchor.toml)
+    - Finally, enter `anchor test --skip-local-validator` to build everything and run tests.
+
+> Note that you may have some issues using latest version of Solana CLI. It is recommend that you install Solana CLI version 1.14.18
   
+
 2. To launch the frontend, head over to `/app` directory and enter: `yarn install && yarn dev`
 
 If you're running on Localnet, you'd need to install Clockwork CLI and launch Clockwork localnet, check out [their docs](https://docs.clockwork.xyz/developers/localnet) for detailed guide!
