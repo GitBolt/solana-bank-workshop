@@ -3,7 +3,7 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-bank_simulator = "GNUJouYfBihnVFjEBGjpPU6om81ExBHTA8XtyVKT6rKW"
+bank_simulator = "2MJ58MfQn9ZUDvRdwdGLtEqf6JKRkrLidRRj6zLchb4g"
 
 [registry]
 url = "https://api.apr.dev"

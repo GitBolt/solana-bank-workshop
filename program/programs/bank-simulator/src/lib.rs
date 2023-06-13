@@ -3,7 +3,7 @@ use anchor_lang::solana_program::{instruction::Instruction, native_token::LAMPOR
 use anchor_lang::InstructionData;
 use clockwork_sdk::state::{Thread, ThreadAccount};
 
-declare_id!("GNUJouYfBihnVFjEBGjpPU6om81ExBHTA8XtyVKT6rKW");
+declare_id!("2MJ58MfQn9ZUDvRdwdGLtEqf6JKRkrLidRRj6zLchb4g");
 
 // Calculating interest per minute instead of anually for faster results
 const MINUTE_INTEREST: f64 = 0.05; // 5% interest return
