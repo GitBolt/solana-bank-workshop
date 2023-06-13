@@ -31,10 +31,10 @@ Let's go through the code and understand how our program works.
 
 1. Constants
 
-- 1.1 Cron Schedule and Automation Fee
-- 1.2 Interest return and seeds
+- 1.1 Interest, Cron Schedule, Automation Fee
+- 1.2 Seeds
 
-2. Initializing Account
+1. Initializing Account
 
 - 2.1 Defining `InitilizeAccount` context
 - 2.2 Defining Clockwork Target Instruction and Trigger
@@ -46,7 +46,7 @@ Let's go through the code and understand how our program works.
 - 3.3 Adding Interest
 
 ----
-#### 1.1 Cron Schedule and Automation Fee
+#### 1.1 Interest, Cron Schedule, Automation Fee
 
 First of all, open up [program/programs/program/src/lib.rs](program/programs/program/src/lib.rs)
 
@@ -57,13 +57,15 @@ In the first few lines, we're defining some really important constants. Let's ha
 
 const MINUTE_INTEREST: f64 = 0.05; // 5% interest return
 const CRON_SCHEDULE: &str = "*/10 * * * * * *"; // 10s https://crontab.guru/
+const AUTOMATION_FEE: f64 = 0.05; // https://docs.clockwork.xyz/developers/threads/fees
+
 
 ```
 We first have `CRON_SCHEDULE` constant defined. This format may look confusing, so in order to create your own schedule time, you can use [CronTab Tool](https://crontab.guru/)
 
 Then, we have our `AUTOMATION_FEE`, this is the fee we can deposit to our Clockwork thread for it to run automations. According to [Clockwork Docs](https://docs.clockwork.xyz/developers/threads/fees), the automation base fee is **0.000001 SOL / executed instruction**
 
-#### 1.2 Interest Return and Seeds
+#### 1.2 Seeds
 
 Have a look into these:
 
@@ -197,6 +199,7 @@ Then, we've defined our trigger, which is a simple cron job for us. It's using t
 
 Finally, we're making a CPI to clockwork thread, starting at line 69.
 
+> Note that in target_ix variable, we're getting `crate::accounts crate::instructions` from Anchor directly at compile time. This is how we're able to get `AddInterest` context accounts and data required without having to import them or anything similar.
 ----
 
 #### 3.1 Depositing Amount
