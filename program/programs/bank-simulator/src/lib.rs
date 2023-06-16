@@ -8,7 +8,7 @@ declare_id!("B8Gwgafr5U1zn57i4KC1vr8z74qRJgXuZsbZeZYD3nTg");
 // Calculating interest per minute instead of anually for faster results
 const MINUTE_INTEREST: f64 = 0.05; // 5% interest return
 const CRON_SCHEDULE: &str = "*/10 * * * * * *"; // 10s https://crontab.guru/
-const AUTOMATION_FEE: f64 = 0.05; // https://docs.clockwork.xyz/developers/threads/fees
+const AUTOMATION_FEE: u64 = 5000000; // https://docs.clockwork.xyz/developers/threads/fees
 
 pub const BANK_ACCOUNT_SEED: &[u8] = b"bank_account";
 pub const THREAD_AUTHORITY_SEED: &[u8] = b"authority";
@@ -72,7 +72,7 @@ pub mod bank_simulator {
                 },
                 &[&[THREAD_AUTHORITY_SEED, &[bump]]],
             ),
-            (AUTOMATION_FEE * LAMPORTS_PER_SOL as f64) as u64,
+            AUTOMATION_FEE,
             thread_id,
             vec![target_ix.into()],
             trigger,
