@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::{instruction::Instruction, native_token::LAMPORTS_PER_SOL};
+use anchor_lang::solana_program::{instruction::Instruction};
 use anchor_lang::InstructionData;
 use clockwork_sdk::state::{Thread, ThreadAccount};
 
