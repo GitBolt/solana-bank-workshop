@@ -17,6 +17,26 @@
 
 In this workshop, we'll learn about on-chain automation using Clockwork by simulating interest returns in bank account. In real life, banks offer interest rates of around 2.5% - 7% annually. In our program however, we'll be implementing 5% returns per minute, just to display the balance change considerably enough, otherwise, we would need to wait for a long time to notice a significant change in the balance with the real-world interest rate.
 
+### How to Build & Run
+
+1. You would need to deploy the program on Solana blockchain first. You can use SolPg to get started quickly or clone this and work locally:
+ - SOLPg
+   - Click on the [Solana Playground](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) link and deploy it
+  - Working Locally
+    - Install [Anchor](https://www.anchor-lang.com/), [Rust](https://www.rust-lang.org/tools/install) and [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) and [Clockwork CLI](https://docs.clockwork.xyz/welcome/installation) and clone this repository
+    - Run `clockwork localnet`
+    - Then, open a new terminal instance and head over to `program/` directory using `cd program/` command.
+    - Enter `anchor build` and `yarn install` in the same directory.
+    - Then, enter `anchor deploy`, you'll get a program Id at the end, copy it and paste it in [declare_id macro](/program/programs/bank-simulator/src/lib.rs) and in [Anchor.toml localnet section](/program/Anchor.toml)
+    - Finally, enter `anchor test --skip-local-validator` to build everything and run tests.
+
+> Note that you may have some issues using latest version of Solana CLI. It is recommend that you install Solana CLI version 1.14.18
+If you see blockhash keep expiring when you run `anchor deploy` or when running `anchor test`, then just stop your clockwork validator and re-start it. That will solve the issue.
+  
+
+2. To launch the frontend, head over to `/app` directory and enter: `yarn install && yarn dev`
+
+
 ### Automation
 
 We'll be using [Clockwork](https://www.clockwork.xyz/) for running a cron job that updates our balance with interest returns every 10 seconds. In the real world, interest returns are deposited on a periodic basis, the interval however is large, like quarterly or yearly. We'll be depositing every 10 seconds to quickly observe changes and understand better.
@@ -396,21 +416,3 @@ We just need to define the correct offset for the byte data we are looking at, a
 And that is it! It's that easy to fetch particular accounts through filters. If we wanted to get let's say, all bank accounts with balance 100, we would just need to add 8 + (4 + 12) offset and enter our amount in bytes!
 
 
-### How to Build & Run
-
-1. You would need to deploy the program on Solana blockchain first. You can use SolPg to get started quickly or clone this and work locally:
- - SOLPg
-   - Click on the [Solana Playground](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) link and deploy it
-  - Working Locally
-    - Install [Anchor](https://www.anchor-lang.com/), [Rust](https://www.rust-lang.org/tools/install) and [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) and [Clockwork CLI](https://docs.clockwork.xyz/welcome/installation) and clone this repository
-    - Run `clockwork localnet`
-    - Then, open a new terminal instance and head over to `program/` directory using `cd program/` command.
-    - Enter `anchor build` and `yarn install` in the same directory.
-    - Then, enter `anchor deploy`, you'll get a program Id at the end, copy it and paste it in [declare_id macro](/program/programs/bank-simulator/src/lib.rs) and in [Anchor.toml localnet section](/program/Anchor.toml)
-    - Finally, enter `anchor test --skip-local-validator` to build everything and run tests.
-
-> Note that you may have some issues using latest version of Solana CLI. It is recommend that you install Solana CLI version 1.14.18
-If you see blockhash keep expiring when you run `anchor deploy` or when running `anchor test`, then just stop your clockwork validator and re-start it. That will solve the issue.
-  
-
-1. To launch the frontend, head over to `/app` directory and enter: `yarn install && yarn dev`

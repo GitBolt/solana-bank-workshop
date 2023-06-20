@@ -1,5 +1,5 @@
 import { ClockworkProvider } from "@clockwork-xyz/sdk";
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
 import { BankSimulator } from "../target/types/bank_simulator";
 
 describe("bank", async () => {
