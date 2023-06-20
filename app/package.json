@@ -14,7 +14,7 @@
     "@clockwork-xyz/sdk": "^0.3.2",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@project-serum/anchor": "^0.26.0",
+    "@coral-xyz/anchor": "^0.27.0",
     "@solana/wallet-adapter-base": "^0.9.22",
     "@solana/wallet-adapter-react": "^0.15.32",
     "@solana/wallet-adapter-react-ui": "^0.9.31",

@@ -6,7 +6,7 @@ export const truncatedPublicKey = (publicKey: string, length?: number) => {
     return publicKey.replace(publicKey.slice(length, 44 - length), '...');
   };
 
-  import * as anchor from '@project-serum/anchor'
+  import * as anchor from '@coral-xyz/anchor'
   import { PublicKey } from '@solana/web3.js';
   import { DEVNET_PROGRAM_ID, DEVNET_RPC } from '@/util/constants';
   import { IDLData, IDLType } from "@/util/idl";

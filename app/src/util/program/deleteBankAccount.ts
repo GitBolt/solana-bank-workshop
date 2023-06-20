@@ -1,4 +1,4 @@
-import * as anchor from '@project-serum/anchor'
+import * as anchor from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js';
 import { ClockworkProvider } from "@clockwork-xyz/sdk";
 import { anchorProgram } from '@/util/helper';
