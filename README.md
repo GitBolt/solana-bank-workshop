@@ -4,7 +4,7 @@
 
 | Link        | Instructor | Event |
 | ----------- | ---------- | ----- |
-| Coming Soon | -          | -     |
+| [Coming Soon](https://youtu.be/NdAqDliplbs) | Bolt        | [Superteam Lurkers on Zoom](https://lu.ma/solanabanksimulator)     |
 
 ## ☄️ Open in Solana Playground IDE
 
