@@ -4,7 +4,7 @@
 
 | Link        | Instructor | Event |
 | ----------- | ---------- | ----- |
-| Coming Soon | -          | -     |
+| [<img src="https://raw.githubusercontent.com/Solana-Workshops/.github/main/.docs/youtube-icon.png" alt="youtube" width="20" align="center"/> Recording](https://youtu.be/NdAqDliplbs) | Bolt        | [Superteam Lurkers on Zoom](https://lu.ma/solanabanksimulator)     |
 
 ## ☄️ Open in Solana Playground IDE
 
