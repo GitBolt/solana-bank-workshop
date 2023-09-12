@@ -10,7 +10,7 @@
 
 | Program         | Link                                                                                                                                                                               |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Bank Simulator | [ ![program](https://ik.imagekit.io/mkpjlhtny/solpg_button_zWM8WlPKs.svg?ik-sdk-version=javascript-1.4.3&updatedAt=1662621556513)](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) |
+| Bank Simulator | [ ![program](https://ik.imagekit.io/mkpjlhtny/solpg_button_zWM8WlPKs.svg?ik-sdk-version=javascript-1.4.3&updatedAt=1662621556513)](https://beta.solpg.io/65008f7b6f50baeacc2cd48d) |
 
 
 ## 📗 Learn
@@ -21,7 +21,7 @@ In this workshop, we'll learn about on-chain automation using Clockwork by simul
 
 1. You would need to deploy the program on Solana blockchain first. You can use SolPg to get started quickly or clone this and work locally:
  - SOLPg
-   - Click on the [Solana Playground](https://beta.solpg.io/645fc8f0d6ebe745da2043a6) link and deploy it
+   - Click on the [Solana Playground](https://beta.solpg.io/65008f7b6f50baeacc2cd48d) link and deploy it
   - Working Locally
     - Install [Anchor](https://www.anchor-lang.com/), [Rust](https://www.rust-lang.org/tools/install) and [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) and [Clockwork CLI](https://docs.clockwork.xyz/welcome/installation) and clone this repository
     - Run `clockwork localnet`
