@@ -6,7 +6,6 @@ import { openBankAccount } from '@/util/program/openAccount'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet'
 import { useRouter } from 'next/router'
-import { getBankAccount } from '@/util/program/getBankAccount'
 
 
 export default function Home() {

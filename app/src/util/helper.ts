@@ -8,7 +8,7 @@ export const truncatedPublicKey = (publicKey: string, length?: number) => {
 
   import * as anchor from '@coral-xyz/anchor'
   import { PublicKey } from '@solana/web3.js';
-  import { DEVNET_PROGRAM_ID, DEVNET_RPC } from '@/util/constants';
+  import { DEVNET_PROGRAM_ID, LOCALNET_PROGRAM_ID, DEVNET_RPC, LOCALNET_RPC} from '@/util/constants';
   import { IDLData, IDLType } from "@/util/idl";
   
   
@@ -17,7 +17,9 @@ export const truncatedPublicKey = (publicKey: string, length?: number) => {
       preflightCommitment: 'processed' as anchor.web3.ConfirmOptions,
     };
     const connectionURI =
-      rpc_url || process.env.NEXT_PUBLIC_RPC_URL || DEVNET_RPC
+      rpc_url || LOCALNET_RPC
+
+    console.log("URI: ", connectionURI)
     const connection = new anchor.web3.Connection(
       connectionURI,
       opts.preflightCommitment
@@ -35,7 +37,7 @@ export const truncatedPublicKey = (publicKey: string, length?: number) => {
     const idl = IDLData as anchor.Idl;
     const program = new anchor.Program(
       idl,
-      new PublicKey(DEVNET_PROGRAM_ID),
+      new PublicKey(LOCALNET_PROGRAM_ID),
       provider
     ) as unknown as anchor.Program<IDLType>;
   

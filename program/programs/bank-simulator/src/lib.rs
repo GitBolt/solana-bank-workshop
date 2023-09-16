@@ -8,7 +8,7 @@ pub use errors::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("B8Gwgafr5U1zn57i4KC1vr8z74qRJgXuZsbZeZYD3nTg");
+declare_id!("4QYK43nmFhCkckcSvr167fhYR2nYrVWKBMDdpWkD9PvT");
 
 #[program]
 pub mod bank_simulator {

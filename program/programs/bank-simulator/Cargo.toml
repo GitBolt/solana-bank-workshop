@@ -18,7 +18,7 @@ default = []
 [dependencies]
 clockwork-sdk = "2.0.17"
 anchor-lang ={version="0.27.0",  features = ["init-if-needed"]}
-solana-program = "=1.14.17"
+solana-program = "=1.14.16"
 winnow = "=0.4.1"
 toml_datetime = "=0.6.1"
 arrayref = "0.3.7"

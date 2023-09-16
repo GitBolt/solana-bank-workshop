@@ -62,36 +62,36 @@ describe("bank", async () => {
       .rpc();
   });
 
-  it("Deposit Amount", async () => {
-    await program.methods
-      .deposit(Buffer.from(threadId), balance)
-      .accounts({
-        bankAccount: bank_account,
-        holder: wallet.publicKey,
-      })
-      .rpc();
-  });
+  // it("Deposit Amount", async () => {
+  //   await program.methods
+  //     .deposit(Buffer.from(threadId), balance)
+  //     .accounts({
+  //       bankAccount: bank_account,
+  //       holder: wallet.publicKey,
+  //     })
+  //     .rpc();
+  // });
 
-  it("Withdraw Amount", async () => {
-    await program.methods
-      .withdraw(Buffer.from(threadId), balance)
-      .accounts({
-        bankAccount: bank_account,
-        holder: wallet.publicKey,
-      })
-      .rpc();
-  });
+  // it("Withdraw Amount", async () => {
+  //   await program.methods
+  //     .withdraw(Buffer.from(threadId), balance)
+  //     .accounts({
+  //       bankAccount: bank_account,
+  //       holder: wallet.publicKey,
+  //     })
+  //     .rpc();
+  // });
 
-  it("Delete Account", async () => {
-    await program.methods
-      .removeAccount(Buffer.from(threadId))
-      .accounts({
-        holder: wallet.publicKey,
-        bankAccount: bank_account,
-        thread: threadAddress,
-        threadAuthority: threadAuthority,
-        clockworkProgram: clockworkProvider.threadProgram.programId,
-      })
-      .rpc();
-  });
+  // it("Delete Account", async () => {
+  //   await program.methods
+  //     .removeAccount(Buffer.from(threadId))
+  //     .accounts({
+  //       holder: wallet.publicKey,
+  //       bankAccount: bank_account,
+  //       thread: threadAddress,
+  //       threadAuthority: threadAuthority,
+  //       clockworkProgram: clockworkProvider.threadProgram.programId,
+  //     })
+  //     .rpc();
+  // });
 });

@@ -3,7 +3,7 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-bank_simulator = "B8Gwgafr5U1zn57i4KC1vr8z74qRJgXuZsbZeZYD3nTg"
+bank_simulator = "4QYK43nmFhCkckcSvr167fhYR2nYrVWKBMDdpWkD9PvT"
 
 [registry]
 url = "https://api.apr.dev"
@@ -14,4 +14,4 @@ wallet = "/home/bolt/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
-clock = "clockwork localnet --bpf-program  8ryZ7br7TV2A1d7gBUZWH4u3rGw68GsPfyHneNhoTYCm ./tests/programs/metadata.so --bpf-program auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg ./tests/programs/rules.so"
+clock = "clockwork localnet --bpf-program  4QYK43nmFhCkckcSvr167fhYR2nYrVWKBMDdpWkD9PvT ./tests/programs/metadata.so --bpf-program auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg ./tests/programs/rules.so"

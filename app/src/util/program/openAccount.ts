@@ -1,7 +1,8 @@
 import * as anchor from '@coral-xyz/anchor'
-import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { ClockworkProvider } from "@clockwork-xyz/sdk";
 import { anchorProgram } from '@/util/helper';
+import { LOCALNET_RPC } from '../constants';
 
 export const openBankAccount = async (
   wallet: anchor.Wallet,
@@ -11,9 +12,7 @@ export const openBankAccount = async (
 
   const program = anchorProgram(wallet);
 
-  const clockworkProvider = ClockworkProvider.fromAnchorProvider(
-    program.provider as anchor.AnchorProvider
-  );
+  const clockworkProvider = new ClockworkProvider(wallet, new Connection(LOCALNET_RPC))
 
   const threadId = "bank_account-" + new Date().getTime() / 1000;
 
@@ -31,17 +30,27 @@ export const openBankAccount = async (
     threadId
   );
 
+  console.log(
+    {
+      bankAccount: bank_account.toBase58(),
+      holder: wallet.publicKey.toBase58(),
+      thread: threadAddress.toBase58(),
+      threadAuthority: threadAuthority.toBase58(),
+      clockworkProgram: clockworkProvider.threadProgram.programId.toBase58(),
+    }
+  )
+
   try {
     const ix = await program.methods.initializeAccount(Buffer.from(threadId), holderName, Number(initialDeposit.toFixed(2)))
       .accounts({
         bankAccount: bank_account,
         holder: wallet.publicKey,
-
         thread: threadAddress,
         threadAuthority: threadAuthority,
         clockworkProgram: clockworkProvider.threadProgram.programId,
       }).rpc()
 
+    console.log("Ix: ", ix)
     return { error: false, sig: ix, threadId }
 
   } catch (e: any) {
